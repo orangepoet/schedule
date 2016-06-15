@@ -1,0 +1,7 @@
+FavoritePOINotifyLogId	bigint	　	　	N	Y	PK	POI收藏提醒日志ID	　
+FavoriteId	bigint	　	　	N	N	　	收藏ID	　
+UID	nvarchar	20	　	N	N	IX_FavoritePOINotifyLog_DataChange_CreateTime_UID	携程UID	　
+ActionType	tinyint	　	　	N	N	　	操作类型	1 = Add 2 = Delete
+CLogId	nvarchar	64	　	N	N	　	日志中心记录的日志ID	　
+DataChange_LastTime	datetime	　	　	N	N	　	最后更新时间	默认值:getdate()
+DataChange_CreateTime	datetime	　	　	N	N	IX_FavoritePOINotifyLog_DataChange_CreateTime_UID	创建时间	默认值:getdate()

@@ -1,0 +1,169 @@
+using System;
+using System.Data;
+using System.Collections.Generic;
+
+using Ctrip.Mobile.Server.SmartTrip.Common.Utility;
+using Ctrip.Mobile.Server.SmartTrip.Common.Error;
+using System.Diagnostics;
+
+namespace {{model.namespace}}
+{
+    public sealed class {{model.entity}}
+    {
+        {% for f in model.fields -%}
+        public {{f.ctype}} {{f.name}} { get; set; }
+        {% endfor %}
+    }
+    public static class {{model.name}}Repository
+    {
+        public static IList<{{model.entity}}> QueryAll()
+        {
+            List<{{model.entity}}> result;
+            DataSet dsSmartTrip;
+
+            result = new List<{{model.entity}}>();
+            try
+            {
+                dsSmartTrip = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
+                        "Select_All_{{model.name}}",
+                        CommandType.Text,
+                        c_Select_All_{{model.name}},
+                        null);
+
+                if (DataTableHelper.HasRow(dsSmartTrip))
+                {
+                    foreach (DataRow row in dsSmartTrip.Tables[0].Rows)
+                    {
+                        if (row != null)
+                        {
+                            result.Add(ToEntity(row));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(ServiceErrorCode.DBUnknowError, ServiceErrorMessage.DBUnknowError, ex);
+            }
+            return result;
+        }
+
+        public static {{model.entity}} Query({{model.fields[0].ctype}} {{model.fields[0].name}})
+        {
+            if({{model.fields[0].name}} <= 0)
+            {
+                throw new ArgumentOutOfRangeException("{{model.fields[0].name}}");
+            }
+
+            DataParameterCollection parameter;
+            DataSet ds;
+
+            parameter = new DataParameterCollection();
+            parameter.Add("{{model.fields[0].name}}", DbType.{{model.fields[0].dtype}}, {{model.fields[0].name}});
+            try
+            {
+                ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
+                        "Select_{{model.name}}_ById",
+                        CommandType.Text,
+                        c_Select_All_{{model.name}}_ById,
+                        parameter);
+
+                if (DataTableHelper.HasRow(ds))
+                {
+                    return ToEntity(ds.Tables[0].Rows[0]);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(ServiceErrorCode.DBUnknowError, ServiceErrorMessage.DBUnknowError, ex);
+            }
+            return null;
+        }
+
+        public static {{model.fields[0].ctype}} Insert({{model.entity}} entity)
+        {
+            if(entity==null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            DataParameterCollection parameters;
+
+            parameters = new DataParameterCollection();
+            {% for f in model.fields -%}
+            {%- if loop.first %}
+            parameters.Add("{{f.name}}", DbType.{{f.dtype}}, ParameterDirection.Output, /*value*/ null, /*size*/ 0);
+            {% else -%}
+            parameters.Add("{{f.name}}", DbType.{{f.dtype}}, entity.{{f.name}});
+            {% endif -%}
+            {% endfor %}
+
+            SmartTripDBAccessManager.SmartTripDB.ExecuteNonQuery(
+                c_sqlInsert /*sqlName*/,
+                CommandType.StoredProcedure,
+                c_sqlInsert /*sqlCommand*/,
+                parameters);
+
+            return DbConvertor.ConvertToType<{{model.fields[0].ctype}}>(parameters["{{model.fields[0].name}}"].Value);
+        }
+
+        public static void Update({{model.entity}} entity)
+        {
+            if(entity==null)
+            {
+                throw new ArgumentNullException("entity");
+            }
+
+            DataParameterCollection parameters;
+
+            parameters = new DataParameterCollection();
+            {% for f in model.fields -%}
+            parameters.Add("{{f.name}}", DbType.{{f.dtype}}, entity.{{f.name}});
+            {% endfor %}
+
+            SmartTripDBAccessManager.SmartTripDB.ExecuteNonQuery(
+                c_sqlUpdate /*sqlName*/,
+                CommandType.StoredProcedure,
+                c_sqlUpdate /*sqlCommand*/,
+                parameters);
+        }
+
+        private static {{model.entity}} ToEntity(DataRow row)
+        {
+            Debug.Assert(row != null);
+
+            return new {{model.entity}}
+            {
+                {% for f in model.fields -%}
+                {{f.name}} =  DbConvertor.ConvertToType<{{f.ctype}}>(row["{{f.name}}"]),
+                {% endfor %}
+            };
+        }
+
+        private const string c_Select_All_{{model.name}} = @"
+SELECT
+{%- for f in model.fields %}
+{%- if not loop.first -%}
+,
+{%- endif %}
+    [{{f.name}}]
+{%- endfor %}
+FROM [{{model.table}}] WITH(NOLOCK)
+";
+
+        private const string c_Select_All_{{model.name}}_ById = @"
+SELECT
+{%- for f in model.fields %}
+{%- if not loop.first -%}
+,
+{%- endif %}
+    [{{f.name}}]
+{%- endfor %}
+FROM [{{model.table}}] WITH(NOLOCK)
+WHERE [{{model.fields[0].name}}]=@{{model.fields[0].name}}
+";
+
+        private const string c_sqlInsert = "sp3_{{model.table}}_i";
+        private const string c_sqlUpdate = "sp3_{{model.table}}_u";
+    }
+}

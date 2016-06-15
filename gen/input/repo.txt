@@ -1,0 +1,6 @@
+{
+	"name": "FavoritePOINotifyLog",
+	"entity":"FavoritePOINotifyLogEntity",
+	"namespace":"namespace Ctrip.Mobile.Server.SmartTrip.MessageProcessJobws.Repository",
+	"table": "FavoritePOINotifyLog"
+}

@@ -1,0 +1,13 @@
+{% for type in model %}
+<xs:complexType name="{{ type.name }}">
+    <xs:sequence>
+    {%- for element in type.elements %}
+        <xs:element name="{{ element.name }}" type="{{ element.type }}" minOccurs="{{ element.minOccurs }}" maxOccurs="{{ element.maxOccurs }}">
+            <xs:annotation>
+                <xs:documentation>{{ element.desc }}</xs:documentation>
+            </xs:annotation>
+        </xs:element>
+    {%- endfor %}
+    </xs:sequence>
+</xs:complexType>
+{% endfor %}

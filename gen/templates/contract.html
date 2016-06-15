@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using Ctrip.Mobile.Utility.Common;
+using Newtonsoft.Json;
+
+namespace Ctrip.Mobile.Server.SmartTrip.DataContract
+{
+{%- for t in model -%}
+{% if not loop.first %}
+{% endif %}
+    [JsonObject]
+    [Serializable]
+    public class {{t.name}}
+    {
+{%- for p in t.prop -%}
+{% if not loop.first %}
+{% endif %}
+        {{p.json_desc}}
+        {{p.datagram_desc}}
+        {{p.prop_desc}}
+{%- endfor %}
+    }
+{%- endfor %}
+}
