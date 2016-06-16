@@ -1,0 +1,72 @@
+internal enum AirportLoungeStatus
+{
+    /// <summary>
+    /// 未知
+    /// </summary>
+    Unknown = 0,
+
+    /// <summary>
+    /// 待处理
+    /// </summary>
+    Waiting = 1,
+
+    /// <summary>
+    /// 出票：处理中/已创单
+    /// </summary>
+    Processing = 2,
+
+    /// <summary>
+    /// 部分出票
+    /// </summary>
+    PartialTicket = 3,
+
+    /// <summary>
+    /// 已出票
+    /// </summary>
+    Ticketed = 4,
+
+    /// <summary>
+    /// 出票失败
+    /// </summary>
+    TicketedFailed = 5,
+
+    /// <summary>
+    /// 出票超时
+    /// </summary>
+    TicketTimeout = 6,
+
+    /// <summary>
+    /// 已取消
+    /// </summary>
+    Cancelled = 7,
+
+    /// <summary>
+    /// 全部退票
+    /// </summary>
+    AllRefund = 8,
+
+    /// <summary>
+    /// 部分退票
+    /// </summary>
+    PartialRefund = 9,
+
+    /// <summary>
+    /// 出票：下单失败
+    /// </summary>
+    TicketOrderFailed = 10,
+
+    /// <summary>
+    /// 退票：创单失败
+    /// </summary>
+    RefundOrderFailed = 11,
+
+    /// <summary>
+    /// 退票：创单成功-处理中
+    /// </summary>
+    Refunding = 12,
+
+    /// <summary>
+    /// 退票失败
+    /// </summary>
+    RefundFailed = 13
+}

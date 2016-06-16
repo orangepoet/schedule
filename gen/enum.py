@@ -1,16 +1,14 @@
 from gen.generate import Generator
+import os
 
 
 class EnumCodeGenerate(Generator):
-    path = 'd:/tmp/enum.txt'
-    path2 = 'd:/tmp/enum_declaration.txt'
-
     def __init__(self):
         super(EnumCodeGenerate, self).__init__()
 
     def _get_models(self):
         ret = {'name': '', 'enum_items': []}
-        lines = self.__get_lines(self.path)
+        lines = self.__get_lines(enum_file)
         ret.name = self.__get_enum_name(lines[0])
 
         for line in lines:
@@ -35,8 +33,10 @@ class EnumCodeGenerate(Generator):
             index = line.find('enum')
             return line[index + 1].strip()
 
+global enum_file
 
 def main():
+    enum_file = os.path.join('.','gen/input/enum.txt')
     generator = EnumCodeGenerate()
     generator.generate()
 

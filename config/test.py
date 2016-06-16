@@ -9,8 +9,26 @@ from json import dumps, loads
 from requests import post, codes
 from xml.etree import ElementTree as et
 
-from utils.files import Files
+class Files:
+    def __init__(self):
+        pass
 
+    @staticmethod
+    def copy(src_dir, dst_dir, suffix):
+        if not os.path.isdir(src_dir):
+            raise 'not a directory'
+
+        if not os.path.exists(dst_dir):
+            os.mkdir(dst_dir)
+
+        for file in glob.iglob(os.path.join(src_dir, suffix)):
+            shutil.copy(file, dst_dir)
+            print('copy {0} to {1}'.format(file, dst_dir))
+
+    @staticmethod
+    def delete(dir, files):
+        for f in files:
+            os.remove(os.path.join(dir, f))
 
 class ApiTester(object):
     global ROOT
@@ -189,3 +207,13 @@ class SvcUpdater(object):
         if not self.__copy_version_config():
             ret.append('copy version config failed')
         return ret if len(ret) > 0 else None
+if __name__ == '__main__':
+    print '1: debug, please choose:'
+    case =  raw_input()
+    if case == '1':
+        print 'env:'
+        env = raw_input()
+        SvcDebugger(env).prepare()
+        print 'done'
+    else:
+        print 'invalid'
