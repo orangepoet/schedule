@@ -11,13 +11,22 @@ sys.setdefaultencoding("utf-8")
 
 
 def is_match(left, right):
-    # remove unused chars
-    left = left.replace('楼', '').replace('区', '')
-    right = right.replace('楼', '').replace('区', '')
+    unused = ['楼', '区', '柜台', '岛', '/']
+    splicers = [',', '、']
 
-    if ',' in left:
-        for l in left.split(','):
-            if is_match(l, right):
+    for word in unused:
+        left = left.replace(word, '')
+        right = right.replace(word, '')
+
+    if any(x in left for x in splicers):
+        for y in re.split('|'.join(splicers), left):
+            if is_match(y, right):
+                return True
+        return False
+
+    if any(x in right for x in splicers):
+        for y in re.split('|'.join(splicers), right):
+            if is_match(left, y):
                 return True
         return False
 
@@ -51,13 +60,24 @@ def is_match(left, right):
             return True
         elif left in right and right.replace(left, '', 1).isalpha():
             return True
-        return False
+        else:
+            pattern = r'([a-zA-Z]+)([0-9]+)\w*'
+            m_left = re.findall(pattern, left)
+            m_right = re.findall(pattern, right)
+            if len(m_left) > 0 and len(m_left) == len(m_right):
+                for p_left, p_right in zip(m_left, m_right):
+                    if p_left[0].lstrip('0') != p_right[0].lstrip('0') \
+                            or p_left[1].lstrip('0') != p_right[1].lstrip('0'):
+                        return False
+                return True
+            else:
+                return False
 
 
 y_set = []
 n_set = []
-with open('D:/tmp/data(1).txt', 'r') as fp:
-    match_line = [717, 2129]
+with open('D:/tmp/Analyse/data.txt', 'r') as fp:
+    match_line = [628]
     for index, line in enumerate(fp.readlines()):
         # print line
         line_no = index + 1
@@ -74,10 +94,10 @@ with open('D:/tmp/data(1).txt', 'r') as fp:
             print line_no, 'err: ', line
 
 # save result
-with open('d:/tmp/data_y.txt', 'w+') as fp:
+with open('d:/tmp/Analyse/data_y.txt', 'w+') as fp:
     fp.writelines(y_set)
 
-with open('d:/tmp/data_n.txt', 'w+') as fp:
+with open('d:/tmp/Analyse/data_n.txt', 'w+') as fp:
     fp.writelines(n_set)
 
 print 'done'

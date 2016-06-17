@@ -29,5 +29,6 @@ print '212,120'.isalnum()
 print '212,120'.isalpha()
 print '6' in '66b'
 print 'a-b,.\cr'.replace('\-\\\.\,','')
+print re.split(',|/','a,b/c')
 
 print re.findall(r'([a-zA-Z]+)','t10b')
