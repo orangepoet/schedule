@@ -1,13 +1,15 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
-
+import glob
 import os
 
+import shutil
 from requests.structures import CaseInsensitiveDict
 from time import strftime
 from json import dumps, loads
 from requests import post, codes
 from xml.etree import ElementTree as et
+
 
 class Files:
     def __init__(self):
@@ -29,6 +31,7 @@ class Files:
     def delete(dir, files):
         for f in files:
             os.remove(os.path.join(dir, f))
+
 
 class ApiTester(object):
     global ROOT
@@ -207,13 +210,31 @@ class SvcUpdater(object):
         if not self.__copy_version_config():
             ret.append('copy version config failed')
         return ret if len(ret) > 0 else None
-if __name__ == '__main__':
-    print '1: debug, please choose:'
-    case =  raw_input()
+
+
+def debug():
+    print 'env:'
+    env = raw_input()
+    SvcDebugger(env).prepare()
+
+    print 'done'
+
+
+def update():
+    SvcUpdater().upd()
+    print 'done'
+
+
+def main():
+    print '1: debug, 2: update please choose:'
+    case = raw_input()
     if case == '1':
-        print 'env:'
-        env = raw_input()
-        SvcDebugger(env).prepare()
-        print 'done'
+        debug()
+    elif case == '2':
+        update()
     else:
         print 'invalid'
+
+
+if __name__ == '__main__':
+    main()
