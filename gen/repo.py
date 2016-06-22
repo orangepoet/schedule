@@ -32,7 +32,7 @@ class RepositoryGenerator(Generator):
         return {'name': field[0], 'dtype': self.__get_db_type(field[1]), 'ctype': self.__get_csharp_type(field[1])}
 
     def __get_config_file_path(self, file_name):
-        return os.path.join('d:/tmp', file_name)
+        return os.path.join(os.path.abspath('..'), 'gen/input', file_name)
 
     def __get_csharp_type(self, dbtype):
         return {

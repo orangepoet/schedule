@@ -1,21 +1,19 @@
-
-
 switch(value)
 {
-{%- for item in model.enum_items -%}
+    {% for item in model.enum_items -%}
     case {{ item.value }}:
         return {{model.name}}.{{item.name}}
-{% endfor %}
+    {% endfor -%}
     default:
         return {{model.name}}.Unknown;
 }
 
 switch(type)
 {
-{%- for item in model.enum_items  -%}
+    {% for item in model.enum_items  -%}
     case {{ item.name }}:
         return {{model.name}}.{{item.value}}
-{% endfor %}
+    {% endfor -%}
     default:
         throw new ArgumentOutOfRangeException("type");
 }

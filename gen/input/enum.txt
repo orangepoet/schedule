@@ -1,72 +1,63 @@
-internal enum AirportLoungeStatus
+internal enum Trains
 {
     /// <summary>
-    /// 未知
+    ///  未知
     /// </summary>
-    Unknown = 0,
+    Unknown = 100,
 
     /// <summary>
-    /// 待处理
+    ///  待支付
     /// </summary>
-    Waiting = 1,
+    TRANS_TOPAY = 101,
 
     /// <summary>
-    /// 出票：处理中/已创单
+    ///  支付处理中
     /// </summary>
-    Processing = 2,
+    TRANS_PAY_CONFIRMING = 102,
 
     /// <summary>
-    /// 部分出票
+    ///  支付失败
     /// </summary>
-    PartialTicket = 3,
+    TRANS_PAYED_FAILURE = 103,
 
     /// <summary>
-    /// 已出票
+    ///  支付成功待出票
     /// </summary>
-    Ticketed = 4,
+    TRANS_TO_BUY = 104,
 
     /// <summary>
-    /// 出票失败
+    ///  购票中
     /// </summary>
-    TicketedFailed = 5,
+    TRANS_BUYING = 105,
 
     /// <summary>
-    /// 出票超时
+    ///  已购票
     /// </summary>
-    TicketTimeout = 6,
+    TRANS_BOUGHT = 106,
 
     /// <summary>
-    /// 已取消
+    ///  已配送
     /// </summary>
-    Cancelled = 7,
+    TRANS_DELIVERED = 107,
 
     /// <summary>
-    /// 全部退票
+    ///  已成交
     /// </summary>
-    AllRefund = 8,
+    TRANS_COMPLETED = 108,
 
     /// <summary>
-    /// 部分退票
+    ///  已取消
     /// </summary>
-    PartialRefund = 9,
+    TRANS_CANCELLED = 109,
 
     /// <summary>
-    /// 出票：下单失败
+    ///  部分退票
     /// </summary>
-    TicketOrderFailed = 10,
+    TRANS_UNSUBCRIBE_PART = 110,
 
     /// <summary>
-    /// 退票：创单失败
+    ///  全部退票
     /// </summary>
-    RefundOrderFailed = 11,
+    TRANS_UNSUBCRIBE_ALL = 111,
 
-    /// <summary>
-    /// 退票：创单成功-处理中
-    /// </summary>
-    Refunding = 12,
-
-    /// <summary>
-    /// 退票失败
-    /// </summary>
-    RefundFailed = 13
 }
