@@ -1,7 +1,6 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
 import sys
-
 import re
 
 __author__ = 'chengz'
@@ -74,30 +73,34 @@ def is_match(left, right):
                 return False
 
 
-y_set = []
-n_set = []
-with open('D:/tmp/Analyse/data.txt', 'r') as fp:
-    match_line = [628]
-    for index, line in enumerate(fp.readlines()):
-        # print line
-        line_no = index + 1
-        fields = line.split()
-        if len(fields) == 4:
-            if is_match(fields[2], fields[3]):
-                print line_no, 'y: ', fields[2], fields[3]
-                y_set.append(line)
+def main():
+    y_set = []
+    n_set = []
+    with open('D:/tmp/Analyse/data.txt', 'r') as fp:
+        # match_line = [628]
+        for index, line in enumerate(fp.readlines()):
+            # print line
+            line_no = index + 1
+            fields = line.split()
+            if len(fields) == 4:
+                if is_match(fields[2], fields[3]):
+                    print line_no, 'y: ', fields[2], fields[3]
+                    y_set.append(line)
+                else:
+                    print line_no, 'n: ', fields[2], fields[3]
+                    n_set.append(line)
+                    pass
             else:
-                print line_no, 'n: ', fields[2], fields[3]
-                n_set.append(line)
-                pass
-        else:
-            print line_no, 'err: ', line
+                print line_no, 'err: ', line
 
-# save result
-with open('d:/tmp/Analyse/data_y.txt', 'w+') as fp:
-    fp.writelines(y_set)
+    # save result
+    with open('d:/tmp/Analyse/data_y.txt', 'w+') as fp:
+        fp.writelines(y_set)
 
-with open('d:/tmp/Analyse/data_n.txt', 'w+') as fp:
-    fp.writelines(n_set)
+    with open('d:/tmp/Analyse/data_n.txt', 'w+') as fp:
+        fp.writelines(n_set)
+    print 'done'
 
-print 'done'
+
+if __name__ == '__main__':
+    main()
