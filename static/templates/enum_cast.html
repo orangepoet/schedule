@@ -11,8 +11,8 @@ switch(value)
 switch(type)
 {
     {% for item in model.enum_items  -%}
-    case {{ item.name }}:
-        return {{model.name}}.{{item.value}}
+    case {{model.name}}.{{ item.name }}:
+        return {{item.value}};
     {% endfor -%}
     default:
         throw new ArgumentOutOfRangeException("type");
