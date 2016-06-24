@@ -43,7 +43,7 @@ class EnumCodeGenerate(Generator):
 def main():
     enum_file = os.path.join(os.path.abspath('..'), 'gen/input/enum.txt')
     result = EnumCodeGenerate(enum_file).generate()
-    output = os.path.join(os.path.abspath('.'), 'output', 'enum_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
+    output = os.path.join(os.path.abspath('.'), 'output', 'enum.txt')
     with open(output, 'w+') as fp:
         fp.write(result)
     print 'done'
