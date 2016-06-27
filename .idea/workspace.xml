@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6763e603-a1bd-421c-bdef-daaca08a18ea" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/foo.py" afterPath="$PROJECT_DIR$/foo.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/gen/xsd.py" afterPath="$PROJECT_DIR$/gen/xsd.py" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/dsci/airport_compare.py" afterPath="$PROJECT_DIR$/dsci/airportcomp.py" />
     </list>
     <ignored path="schedule.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -36,14 +33,12 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="codecheck.py" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/codecheck.py">
+      <file leaf-file-name="foo.py" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/foo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.49798658">
-              <caret line="179" column="50" selection-start-line="179" selection-start-column="50" selection-end-line="179" selection-end-column="50" />
-              <folding>
-                <element signature="e#46#85#0" expanded="true" />
-              </folding>
+            <state vertical-scroll-proportion="0.5932886">
+              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -71,8 +66,8 @@
         <option value="$PROJECT_DIR$/gen/xctc.py" />
         <option value="$PROJECT_DIR$/static/templates/xcontract.html" />
         <option value="$PROJECT_DIR$/gen/xsd.py" />
-        <option value="$PROJECT_DIR$/foo.py" />
         <option value="$PROJECT_DIR$/codecheck.py" />
+        <option value="$PROJECT_DIR$/foo.py" />
       </list>
     </option>
   </component>
@@ -4353,21 +4348,33 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/foo.py">
+    <entry file="file://$PROJECT_DIR$/codecheck.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.41073826">
-          <caret line="18" column="36" selection-start-line="18" selection-start-column="36" selection-end-line="18" selection-end-column="36" />
-          <folding />
+        <state vertical-scroll-proportion="0.5892618">
+          <caret line="183" column="0" selection-start-line="183" selection-start-column="0" selection-end-line="183" selection-end-column="0" />
+          <folding>
+            <marker date="1467015569651" expanded="true" signature="46:108" placeholder="import ..." />
+            <marker date="1467015569651" expanded="true" signature="136:503" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="558:622" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="692:1876" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="1924:2583" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="2614:4681" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="4733:5239" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="5275:5478" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="5510:6343" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="6374:6665" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="6700:7919" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="7943:8004" placeholder="..." />
+            <marker date="1467015569651" expanded="true" signature="8018:8039" placeholder="..." />
+          </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/codecheck.py">
+    <entry file="file://$PROJECT_DIR$/foo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.49798658">
-          <caret line="179" column="50" selection-start-line="179" selection-start-column="50" selection-end-line="179" selection-end-column="50" />
-          <folding>
-            <element signature="e#46#85#0" expanded="true" />
-          </folding>
+        <state vertical-scroll-proportion="0.5932886">
+          <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
