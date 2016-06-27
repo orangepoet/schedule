@@ -68,19 +68,19 @@ class XsdGenerator(Generator):
             })
         return ret
 
+
 config_file = os.path.join(os.path.abspath('..'), 'gen', 'input', 'xsd_items.xml')
 
 
 def main():
     import time
-    print os.path.abspath('..')
 
-    # result = XsdGenerator().generate()
-    # output = os.path.join(os.path.abspath('..'), 'gen', 'output',
-    #                       'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
-    #
-    # with open(output, "w+") as fp:
-    #     fp.write(result)
+    result = XsdGenerator().generate()
+    output = os.path.join(os.path.abspath('..'), 'gen', 'output',
+                          'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
+
+    with open(output, "w+") as fp:
+        fp.write(result)
     print 'done'
 
 
