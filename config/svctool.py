@@ -4,10 +4,6 @@ import glob
 import os
 
 import shutil
-from requests.structures import CaseInsensitiveDict
-from time import strftime
-from json import dumps, loads
-from requests import post, codes
 from xml.etree import ElementTree as et
 
 
@@ -31,77 +27,6 @@ class Files:
     def delete(dir, files):
         for f in files:
             os.remove(os.path.join(dir, f))
-
-
-class ApiTester(object):
-    global ROOT
-    global HEADER
-
-    ROOT = 'd:/Users/chengz/Desktop/TestCase'
-    HEADER = {'Content-Type': 'application/json;charset=UTF-8'}
-
-    def __init__(self, test_file):
-        print '>> ' + test_file
-        self.file_path = test_file
-
-    def test(self):
-        metadata = self.load_metadata()
-        resp = ApiTester.post(metadata['server_url'], metadata['post_url'], metadata['service_code'],
-                              metadata['req_head'], metadata['req_body'])
-        act = CaseInsensitiveDict(resp)
-        for item in metadata['expected']:
-            try:
-                assert str(act[item]) == str(metadata['expected'][item]), '>> [%s] : expected::%s, actual::%s' % (
-                    item, metadata['expected'][item], act[item])
-            except KeyError:
-                print '>> segement:: %s not found' % item
-            except Exception as e:
-                print e.message
-
-    def load_metadata(self):
-        with open(self.file_path, 'r') as fin:
-            case_data = loads(fin.read())
-            return {
-                "post_url": case_data['basic']['post_url'],
-                "server_url": case_data['basic']['server_url'],
-                "service_code": case_data['basic']['service_code'],
-                "req_head": case_data['head'],
-                "req_body": case_data['body'],
-                "expected": case_data['expected']
-            }
-
-    @staticmethod
-    def post(server_url, post_url, code, head, body, data_version=5, indented=False, save_result=True):
-        head['ServiceCode'] = code
-        req = {
-            'head': dumps(head),
-            'body': dumps(body),
-            'code': code,
-            'serverUrl': server_url,
-            'datagramVersion': data_version,
-            'indented': indented
-        }
-        try:
-            resp = post(post_url, json=req, headers=HEADER)
-        except Exception as e:
-            print '>> ' + e.message
-            return None
-        else:
-            if resp.status_code == codes.ok:
-                # print '200 ok'
-                content = loads(resp.content)
-                ret = loads(content['body'])
-
-                # Save to file
-                if save_result:
-                    json_file = os.path.join(ROOT, 'resp',
-                                             '%s(%s).json' % (code, strftime('H%H%M%S')))
-                    with open(json_file, 'w+') as fout:
-                        fout.write(dumps(ret))
-                return ret
-            else:
-                print '>> status::%s, message::%s' % (resp.status_code, resp)
-                return None
 
 
 class SvcDebugger(object):
@@ -226,7 +151,7 @@ def update():
 
 
 def main():
-    print '1: debug, 2: update please choose:'
+    print 'choose: 1: debug, 2: update'
     case = raw_input()
     if case == '1':
         debug()
