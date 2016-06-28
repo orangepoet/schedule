@@ -152,10 +152,21 @@ def get_row_data(header, row, col_min, col_max):
 def get_cell_value(cell_value):
     if not isinstance(cell_value, basestring):
         return cell_value
-    if '\n' in cell_value:
-        return '; '.join(str(cell_value).splitlines())
+    else:
+        if '\n' in cell_value:
+            return ' '.join([escape(value) for value in str(cell_value).splitlines()])
+        else:
+            return escape(cell_value)
 
-    return cell_value
+
+def escape(cell_value):
+    return cell_value \
+        .replace('&', '&amp;') \
+        .replace('<', '&lt;') \
+        .replace('>', '&gt;') \
+        .replace('"', '&quot;') \
+        .replace('\'', '&apos;') \
+        .strip()
 
 
 def save_to_xml(upd_service_code, result):
