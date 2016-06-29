@@ -1,5 +1,6 @@
-from gen.generate import Generator
 import os
+
+from generate import Generator
 
 
 class RepositoryGenerator(Generator):

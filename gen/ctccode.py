@@ -1,6 +1,9 @@
+# encoding: utf-8
+# -*- coding: uft-8 -*-
+
 from xml.etree import ElementTree as et
 
-from gen.generate import Generator
+from generate import Generator
 
 
 class ContractGenerator(Generator):

@@ -1,7 +1,9 @@
-import time
+# encoding: utf-8
+# -*- coding: uft-8 -*-
 
-from gen.generate import Generator
 import os
+
+from generate import Generator
 
 
 class EnumCodeGenerate(Generator):

@@ -1,8 +1,9 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
 
-from gen.generate import Generator, CodeGenerateException
 import openpyxl
+
+from generate import Generator, CodeGenerateException
 
 __author__ = 'chengz'
 

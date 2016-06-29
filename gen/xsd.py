@@ -1,8 +1,10 @@
-from xml.etree import ElementTree as et
+# encoding: utf-8
+# -*- coding: uft-8 -*-
 
 import os
+from xml.etree import ElementTree as et
 
-from gen.generate import Generator
+from generate import Generator
 
 
 class XsdGenerator(Generator):
