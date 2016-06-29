@@ -155,21 +155,22 @@ def main():
     import time
 
     dir_root = 'd:/Users/chengz/Desktop/contract'
-    dir_xml = join(dir_root, 'xml/0')
-    dir_save = join(dir_root, 'code', time.strftime('%Y%m%dH%H%M'))
+    dir_xml = join(dir_root, 'xml/dst')
+    dir_out = join(dir_root, 'code', time.strftime('%Y%m%dH%H%M'))
 
     if not exists(dir_xml):
         raise ValueError('dir_xml not exists')
 
-    if not exists(dir_save):
-        mkdir(dir_save)
+    if not exists(dir_out):
+        mkdir(dir_out)
     for file_name in listdir(dir_xml):
         try:
             xml_path = join(dir_xml, file_name)
             dict_contract = resolve(xml_path)
             result = ContractGenerator(dict_contract).generate()
             (file_raw_name, extension) = splitext(file_name)
-            with open(join(dir_save, '{file_name}.txt'.format(file_name=file_raw_name)), "w+") as fp:
+            file_out = join(dir_out, '{file_name}.txt'.format(file_name=file_raw_name))
+            with open(file_out, "w+") as fp:
                 fp.write(result)
         except Exception as e:
             print '[error]: generate file {file} failed, message: {message}'.format(file=file_name, message=e.message)

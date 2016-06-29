@@ -170,24 +170,18 @@ def escape(cell_value):
         .strip()
 
 
-def save_to_xml(upd_service_code, result):
+def main():
     import time
-    from os.path import exists
+    from os.path import exists, join
     from os import mkdir
 
-    out_dir = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'.format(timestamp=time.strftime('%Y%m%dH%H%M'))
+    excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
+    dir_out = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'.format(timestamp=time.strftime('%Y%m%dH%H%M'))
 
-    if not exists(out_dir):
-        mkdir(out_dir)
-    with open('{folder}/{code}.xml'.format(folder=out_dir, code=upd_service_code), 'w+') as fp:
-        fp.write(result)
+    if not exists(dir_out):
+        mkdir(dir_out)
 
-
-def main():
-    file_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-
-    wb = openpyxl.load_workbook(file_path)
-
+    wb = openpyxl.load_workbook(excel_path)
     for row in wb['Overview']:
         svc_info = try_get_upd_svc(row)
         if svc_info:
@@ -203,7 +197,9 @@ def main():
                 print 'error: ', e.message
             else:
                 if result:
-                    save_to_xml(svc_info['code'], result)
+                    file_out = join(dir_out, '{file_name}.xml'.format(file_name=svc_info['code']))
+                    with open(file_out, 'w+') as fp:
+                        fp.write(result)
 
 
 if __name__ == '__main__':
