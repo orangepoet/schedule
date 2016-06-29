@@ -2,7 +2,8 @@
 # -*- coding: uft-8 -*-
 
 import os
-from xml.etree import ElementTree as et
+
+import openpyxl
 
 from generate import Generator
 
@@ -10,75 +11,74 @@ from generate import Generator
 class XsdGenerator(Generator):
     template_name = 'xsd.html'
 
-    def __init__(self):
-        pass
+    def __init__(self, model):
+        super(XsdGenerator, self).__init__()
+        self.__model = model
 
     def _get_models(self):
-        root = et.parse(config_file).getroot()
-        items = root.findall('item')
-        ret = []
-        for item in items:
-            self.__append_complex_types(item, ret)
+        return self.__model
+
+
+def get_xsd_type(type):
+    if type in ['string', 'int', 'decimal', 'DateTime']:
+        return 'xs:' + type
+    else:
+        return type + 'Type'
+
+
+def get_elements(children):
+    ret = []
+    for child in children:
+        ret.append({
+            'name': child.get('name'),
+            'type': get_xsd_type(child.get('type')),
+            'minOccurs': '1' if child.get('required') == 'Y' else '0',
+            'maxOccurs': 'unbounded' if 'List' in child.get('type') else '1',
+            'desc': child.get('remark')
+        })
+    return ret
+
+
+def parse_xsd_type(xls_obj):
+    ret = []
+
+    children = xls_obj['children']
+    if not children:
         return ret
 
-    def __get_xsd_type(self, metadata, m_type):
-        metadata2 = str.lower(metadata)
-        if metadata2 == "dynamic":
-            return "xs:string"
-        elif metadata2 == "int4" or metadata2 == "int10":
-            return "xs:int"
-        elif metadata2 == "int20":
-            return "xs:long"
-        elif metadata2 == "nullableclass" or metadata2 == "class" or metadata2 == "enum":
-            return m_type
-        elif metadata2 == "list":
-            return self.__get_xsd_type(m_type, None)
-        elif metadata2 == "decimal2" or metadata2 == "decimal6":
-            return 'xs:decimal'
-        elif metadata2 == "datetime" or metadata2 == "date":
-            return 'xs:dateTime'
-        elif metadata2 == "boolean":
-            return 'xs:boolean'
-        elif metadata2 == 'code2':
-            return 'xs:string'
-        else:
-            return metadata
-        pass
+    complex_type = {
+        'name': (xls_obj['type'] if xls_obj.has_key('type') else xls_obj['name']) + 'Type',
+        'elements': get_elements(children)
+    }
 
-    def __append_complex_types(self, xnode, ret):
-        attrs = xnode.attrib
-        cnodes = xnode.findall('item')
-        complex_type = {
-            'name': attrs['type'] + 'Type',
-            'elements': self.__get_elements(cnodes)
-        }
-        ret.append(complex_type)
-        for cnode in cnodes:
-            if len(cnode.findall('item')) > 0:
-                self.__append_complex_types(cnode, ret)
-
-    def __get_elements(self, xnodes):
-        ret = []
-        for node in xnodes:
-            attrs = node.attrib
-            ret.append({
-                'name': attrs['shortName'],
-                'type': self.__get_xsd_type(attrs['metadata'], attrs['type'] + 'Type'),
-                'minOccurs': '0' if attrs['require'] == 'False' else '1',
-                'maxOccurs': 'unbounded' if attrs['metadata'] == 'List' else '1',
-                'desc': attrs['description']
-            })
-        return ret
+    ret.append(complex_type)
+    for child in children:
+        if child['children']:
+            ret.extend(parse_xsd_type(child))
+    return ret
 
 
-config_file = os.path.join(os.path.abspath('..'), 'gen', 'input', 'xsd_items.xml')
+def parse_xsd(sheet_data):
+    ret = []
+    ret.extend(parse_xsd_type(sheet_data['req']))
+    ret.extend(parse_xsd_type(sheet_data['resp']))
+    return ret
 
 
 def main():
     import time
+    from gen.ctcxml import get_sheet_data
 
-    result = XsdGenerator().generate()
-    output = os.path.join(os.path.abspath('..'), 'gen', 'output',
+    excel_path = unicode(r'D:\schedule\doc\ctc\ScheduleExternalApi\ScheduleExternalApi.xlsx')
+    sheet_name = 'GetGeofenceRegistrationInfo'
+
+    wb = openpyxl.load_workbook(excel_path)
+    sheet = wb.get_sheet_by_name(sheet_name)
+    sheet_data = get_sheet_data(sheet)
+    xsd_types = parse_xsd(sheet_data)
+
+    result = XsdGenerator(xsd_types).generate()
+    output = os.path.join(os.path.abspath('..'), 'static/output',
                           'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
 
     with open(output, "w+") as fp:

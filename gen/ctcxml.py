@@ -44,7 +44,7 @@ def try_get_upd_svc(row):
         return None
 
 
-def get_sheet_data(sheet, svc_info):
+def get_sheet_data(sheet):
     rows = sheet.rows
     col_max = sheet.max_column
     row_max = sheet.max_row
@@ -66,11 +66,6 @@ def get_sheet_data(sheet, svc_info):
     resp = get_square_data(header, rows, split_row_idx, row_max, col_min, col_max)
 
     return {
-        'base': {
-            'name': svc_info['name'],
-            'code': svc_info['code'],
-            'desc': svc_info['desc']
-        },
         'req': req,
         'resp': resp
     }
@@ -187,7 +182,9 @@ def main():
         if svc_info:
             try:
                 sheet = wb.get_sheet_by_name(str(svc_info['code']))
-                model = get_sheet_data(sheet, svc_info)
+                model = get_sheet_data(sheet)
+                model['base'] = {'name': svc_info['name'], 'code': svc_info['code'], 'desc': svc_info['desc']}
+
                 result = XContractGenerate(model).generate()
             except ExcelFormatException:
                 print 'error: ', 'excel format error'
