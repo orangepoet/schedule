@@ -183,8 +183,7 @@ def save_to_xml(upd_service_code, result):
 
 
 def main():
-    from os.path import join, abspath
-    file_path = join(abspath('..'), 'static/input/contract.xlsx')
+    file_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
 
     wb = openpyxl.load_workbook(file_path)
 
