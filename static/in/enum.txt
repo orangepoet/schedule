@@ -1,7 +1,0 @@
-internal enum PollingBizType
-{
-    Others = 0,
-    Flight = 1,
-    Hotel = 2,
-    Train = 3
-}
