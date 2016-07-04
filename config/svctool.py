@@ -51,8 +51,10 @@ class SvcDebugger(object):
 
         if self.__env == 'fat':
             dst_env = root.find('fat')
-        else:
+        elif self.__dev == 'uat':
             dst_env = root.find('uat_nt')
+        else:
+            raise ValueError('env is invalid')
 
         sect_defv.clear()
         for e in dst_env.getchildren():

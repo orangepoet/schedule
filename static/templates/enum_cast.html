@@ -21,7 +21,7 @@ switch(type)
 switch(str)
 {
     {% for item in model.enum_items  -%}
-    case "{{ item.name.upper() }}":
+    case "{{ item.name.upper()}}":
         return {{model.name}}.{{ item.name }};
     {% endfor -%}
     default:

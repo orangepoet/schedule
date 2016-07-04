@@ -122,9 +122,8 @@ def check_version_map(lst_contract_service_item):
 
 
 def get_new_contract_code_list():
-    version = 618
     new_contract_dir = r'd:\Users\chengz\Desktop\Contract\xml\dst'
-    return (version, [int(service_code.replace('.xml', '')) for service_code in listdir(new_contract_dir)])
+    return (current_version, [int(service_code.replace('.xml', '')) for service_code in listdir(new_contract_dir)])
 
 
 def check_by_contract_code():
@@ -186,6 +185,9 @@ def check_by_new_contract_xml():
 
 
 def contract_check():
+    global current_version
+
+    current_version = 619
     check_by_contract_code()
     check_by_new_contract_xml()
 

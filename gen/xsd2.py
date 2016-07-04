@@ -18,21 +18,30 @@ class XsdGenerator(Generator):
         return self.__model
 
 
-def get_xsd_type(type):
-    if type in ['string', 'int', 'decimal', 'DateTime']:
-        return 'xs:' + type
+def get_xsd_type(metadata, ctctype):
+    if ctctype is None:
+        ret = {
+            'dynamic': 'xs:string',
+            'int4': 'xs:int',
+            'int10': 'xs:int',
+            'int20': 'xs:long',
+            'boolean': 'xs:boolean',
+            'decimal2': 'xs:decimal',
+            'decimal6': 'xs:decimal'
+        }[str(metadata).lower()]
     else:
-        return type + 'Type'
+        ret = ctctype + 'Type'
+    return ret
 
 
 def get_elements(children):
     ret = []
     for child in children:
         ret.append({
-            'name': child.get('name'),
-            'type': get_xsd_type(child.get('type')),
+            'name': child.get('short_name'),
+            'type': get_xsd_type(child.get('metadata'), child.get('type')),
             'minOccurs': '1' if child.get('required') == 'Y' else '0',
-            'maxOccurs': 'unbounded' if 'List' in child.get('type') else '1',
+            'maxOccurs': 'unbounded' if 'List' in child.get('metadata') else '1',
             'desc': child.get('remark')
         })
     return ret
@@ -69,7 +78,7 @@ def main():
     from gen.ctcxml import get_sheet_data
 
     excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-    sheet_name = '30302501'
+    sheet_name = '30302502'
 
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb.get_sheet_by_name(sheet_name)

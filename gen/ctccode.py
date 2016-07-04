@@ -53,7 +53,7 @@ class ContractGenerator(Generator):
         for item in items:
             fmt = ', Format = "{0}"'.format(self.__to_format(item["format"]).replace('\\', '/')) if item[
                 "format"] else ''
-            cs_type = self.__get_cs_type(item["metadata"], item["type"])
+            cs_type = get_cs_type(item["metadata"], item["type"])
 
             prop = {
                 "json_desc": json_desc_format.format(short_name=item["short_name"]),
@@ -79,29 +79,30 @@ class ContractGenerator(Generator):
             return fmt.replace("\\", "/")
         pass
 
-    def __get_cs_type(self, metadata, m_type):
-        metadata2 = str.lower(metadata)
-        if metadata2 == "dynamic":
-            return "string"
-        elif metadata2 == "int4" or metadata2 == "int10":
-            return "int"
-        elif metadata2 == "int20":
-            return "long"
-        elif metadata2 == "nullableclass" or metadata2 == "class" or metadata2 == "enum":
-            return m_type
-        elif metadata2 == "list":
-            return 'List<{0}>'.format(self.__get_cs_type(m_type, None))
-        elif metadata2 == "decimal2" or metadata2 == "decimal6":
-            return 'decimal'
-        elif metadata2 == "dateTime" or metadata2 == "date":
-            return 'DateTime'
-        elif metadata2 == "boolean":
-            return 'bool'
-        elif metadata2 == 'code2':
-            return 'string'
-        else:
-            return metadata
-        pass
+
+def get_cs_type(metadata, m_type):
+    metadata2 = str(metadata).lower()
+    if metadata2 == "dynamic":
+        return "string"
+    elif metadata2 == "int4" or metadata2 == "int10":
+        return "int"
+    elif metadata2 == "int20":
+        return "long"
+    elif metadata2 == "nullableclass" or metadata2 == "class" or metadata2 == "enum":
+        return m_type
+    elif metadata2 == "list":
+        return 'List<{0}>'.format(get_cs_type(m_type, None))
+    elif metadata2 == "decimal2" or metadata2 == "decimal6":
+        return 'decimal'
+    elif metadata2 == "dateTime" or metadata2 == "date":
+        return 'DateTime'
+    elif metadata2 == "boolean":
+        return 'bool'
+    elif metadata2 == 'code2':
+        return 'string'
+    else:
+        return metadata
+    pass
 
 
 def resolve_items(items):
@@ -142,6 +143,10 @@ def resolve_response(response):
 
 
 def resolve(xml_path):
+    """Resolve contract xml, return a dict as { "req":..., "resp":...}
+    req and resp share same struct as {"name":... "type":... "items":... }
+    item props same with excel columns
+    """
     root = et.parse(xml_path).getroot()
     return {
         "req": resolve_request(root.find("Request")),
