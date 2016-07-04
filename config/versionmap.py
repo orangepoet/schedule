@@ -23,7 +23,7 @@ def new_items():
 
     version_min = 584
 
-    version_map_path = join(abspath('..'), 'static/input/version_map.txt')
+    version_map_path = join(abspath('..'), 'static/in/version_map.txt')
     with open(version_map_path, 'r') as fp:
         ret = load(fp)
         if ret:

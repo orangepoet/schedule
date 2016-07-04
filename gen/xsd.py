@@ -78,7 +78,7 @@ def main():
     xsd_types = parse_xsd(sheet_data)
 
     result = XsdGenerator(xsd_types).generate()
-    output = os.path.join(os.path.abspath('..'), 'static/output',
+    output = os.path.join(os.path.abspath('..'), 'static/out',
                           'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
 
     with open(output, "w+") as fp:

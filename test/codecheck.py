@@ -123,7 +123,7 @@ def check_version_map(lst_contract_service_item):
 
 def get_new_contract_code_list():
     version = 618
-    new_contract_dir = r'd:\Users\chengz\Desktop\Contract\xml\20160624H1950'
+    new_contract_dir = r'd:\Users\chengz\Desktop\Contract\xml\dst'
     return (version, [int(service_code.replace('.xml', '')) for service_code in listdir(new_contract_dir)])
 
 
@@ -168,7 +168,9 @@ def check_by_new_contract_xml():
         print 'error: version map lose new service all'
     for service_code in new_contracts[1]:
         if not version_map_items[version_value].has_key(service_code):
-            print 'error: version map lose new service: {service}'.format(service=service_code)
+            print 'error: version map lose service: {service} in {version}'.format(service=service_code,
+                                                                                   version=version_value)
+            continue
         platforms = version_map_items[version_value][service_code]
         if platforms is None:
             raise ValueError('platform is empty')
