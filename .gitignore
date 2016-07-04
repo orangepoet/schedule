@@ -92,3 +92,4 @@ ENV/
 
 foo.py
 static/out/
+static/in/
