@@ -1,24 +1,18 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
 
+import time
+from email import message
+from os import mkdir
+from os.path import exists, join
+
 import openpyxl
 
-from generate import Generator, CodeGenerateException
+from gen import render_template, CodeGenerateException, write_file
 
-__author__ = 'chengz'
-
-
-class ContractXmlGenerate(Generator):
-    template_name = 'ctcxml.html'
-
-    def __init__(self, model):
-        self.__model = model
-        pass
-
-    def _get_models(self):
-        return self.__model
-
-    pass
+template_name = 'ctcxml.html'
+excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
+dir_out_format = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'
 
 
 class ExcelFormatException(Exception):
@@ -27,7 +21,8 @@ class ExcelFormatException(Exception):
 
 
 def is_not_default_color(font):
-    return font.color.value != '00000000'
+    while_color = '00000000'
+    return font.color.value != while_color
 
 
 def try_get_upd_svc(row):
@@ -166,15 +161,9 @@ def escape(cell_value):
 
 
 def main():
-    import time
-    from os.path import exists, join
-    from os import mkdir
-
-    excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-    dir_out = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'.format(timestamp=time.strftime('%Y%m%dH%H%M'))
-
-    if not exists(dir_out):
-        mkdir(dir_out)
+    dir_out_path = dir_out_format.format(timestamp=time.strftime('%Y%m%dH%H%M'))
+    if not exists(dir_out_path):
+        mkdir(dir_out_path)
 
     wb = openpyxl.load_workbook(excel_path)
     for row in wb['Overview']:
@@ -184,21 +173,19 @@ def main():
                 sheet = wb.get_sheet_by_name(str(svc_info['code']))
                 model = get_sheet_data(sheet)
                 model['base'] = {'name': svc_info['name'], 'code': svc_info['code'], 'desc': svc_info['desc']}
-
-                result = ContractXmlGenerate(model).generate()
+                result = render_template('', model)
             except ExcelFormatException:
-                print 'error: ', 'excel format error'
+                print '[ExcelFormatException]: message > {message}'.format(message=e.message)
             except CodeGenerateException as e:
-                print 'error: ', e.message
+                print '[CodeGenerateException]: message > {message}'.format(message=e.message)
             except Exception as e:
-                print 'error: ', e.message
+                print '[Exception]: message > {message}'.format(message=e.message)
             else:
                 if result:
-                    file_out = join(dir_out, '{file_name}.xml'.format(file_name=svc_info['code']))
-                    with open(file_out, 'w+') as fp:
-                        fp.write(result)
+                    file_out = join(dir_out_format, '{file_name}.xml'.format(file_name=svc_info['code']))
+                    write_file(file_out, model)
+    print 'done'
 
 
 if __name__ == '__main__':
     main()
-    print 'done'

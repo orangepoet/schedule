@@ -1,3 +1,4 @@
+from json import load
 from os.path import join, abspath
 
 from jinja2 import Environment, FileSystemLoader
@@ -11,9 +12,14 @@ class CodeGenerateException(Exception):
 env = Environment(loader=FileSystemLoader(join(abspath('..'), 'static/templates')))
 
 
-def read_in_file_lines(file_name):
+def read_as_lines(file_name):
     with open(join(abspath('..'), 'static/in', file_name), 'r') as fp:
         return fp.readlines()
+
+
+def read_as_json(file_name):
+    with open(join(abspath('..'), 'static/in', file_name), 'r') as fp:
+        return load(fp)
 
 
 def write_out_file(file_name, out):

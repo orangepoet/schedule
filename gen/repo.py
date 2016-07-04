@@ -1,65 +1,65 @@
-import os
+import time
 
-from generate import Generator
+from gen import render_template, CodeGenerateException, write_out_file, read_as_json, read_as_lines
+
+template_name = 'repository.html'
+base_config = 'repo.txt'
+tb_config = 'tb.txt'
 
 
-class RepositoryGenerator(Generator):
-    template_name = 'repository.html'
-    base_config = 'repo.txt'
-    tb_config = 'tb.txt'
+def get_line_fields(line):
+    field = line.split()
+    return {'name': field[0], 'dtype': get_db_type(field[1]), 'ctype': get_csharp_type_from_dbtype(field[1])}
 
-    def __init__(self):
-        super(RepositoryGenerator, self).__init__()
 
-    def _get_models(self):
-        from json import load
+def get_csharp_type_from_dbtype(dbtype):
+    return {
+        'bigint': 'long',
+        'int': 'int',
+        'nvarchar': 'string',
+        'datetime': 'DateTime',
+        'tinyint': 'int'
+    }[dbtype]
 
-        m_tb_fields = []
-        with open(self.__get_config_file_path(self.base_config), 'r') as fin:
-            m_base_config = load(fin)
-        with open(self.__get_config_file_path(self.tb_config), 'r') as fin:
-            for l in fin.readlines():
-                m_tb_fields.append(self.__read_fields(l))
-        return {
-            'name': m_base_config['name'],
-            'entity': m_base_config['entity'],
-            'table': m_base_config['table'],
-            'namespace': m_base_config['namespace'],
-            'fields': m_tb_fields
-        }
 
-    def __read_fields(self, line):
-        field = line.split()
-        return {'name': field[0], 'dtype': self.__get_db_type(field[1]), 'ctype': self.__get_csharp_type(field[1])}
+def get_db_type(dbtype):
+    return {
+        'bigint': 'Int64',
+        'int': 'Int32',
+        'nvarchar': 'String',
+        'datetime': 'DateTime',
+        'tinyint': 'Int16'
+    }[dbtype]
 
-    def __get_config_file_path(self, file_name):
-        return os.path.join(os.path.abspath('..'), 'gen/input', file_name)
 
-    def __get_csharp_type(self, dbtype):
-        return {
-            'bigint': 'long',
-            'int': 'int',
-            'nvarchar': 'string',
-            'datetime': 'DateTime',
-            'tinyint': 'int'
-        }[dbtype]
+def get_repo_model():
+    ret = []
 
-    def __get_db_type(self, dbtype):
-        return {
-            'bigint': 'Int64',
-            'int': 'Int32',
-            'nvarchar': 'String',
-            'datetime': 'DateTime',
-            'tinyint': 'Int16'
-        }[dbtype]
+    base_ = read_as_json(base_config)
+    for line in read_as_lines(tb_config):
+        ret.append(get_line_fields(line))
+
+    return {
+        'name': base_['name'],
+        'entity': base_['entity'],
+        'table': base_['table'],
+        'namespace': base_['namespace'],
+        'fields': ret
+    }
 
 
 def main():
-    import time
-    result = RepositoryGenerator().generate()
-    output = os.path.join(os.path.abspath('.'), 'output', 'repo_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')))
-    with open(output, 'w+') as fp:
-        fp.write(result)
+    try:
+        model = get_repo_model()
+        result = render_template(template_name, model)
+    except CodeGenerateException as e:
+        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
+    except Exception as e:
+        print '[Exception]: message > {message}'.format(message=e.message)
+    else:
+        if result:
+            write_out_file('repo_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')), result)
+
     print 'done'
 
 

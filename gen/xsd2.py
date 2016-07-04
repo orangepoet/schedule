@@ -3,19 +3,9 @@
 
 import openpyxl
 
-from gen import write_out_file
-from generate import Generator
+from gen import write_out_file, CodeGenerateException, render_template
 
-
-class XsdGenerator(Generator):
-    template_name = 'xsd.html'
-
-    def __init__(self, model):
-        super(XsdGenerator, self).__init__()
-        self.__model = model
-
-    def _get_models(self):
-        return self.__model
+template_name = 'xsd.html'
 
 
 def get_xsd_type(metadata, ctctype):
@@ -85,8 +75,14 @@ def main():
     sheet_data = get_sheet_data(sheet)
     xsd_types = parse_xsd(sheet_data)
 
-    result = XsdGenerator(xsd_types).generate()
-    file_out = 'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M'))
+    try:
+        result = render_template(template_name, xsd_types)
+    except CodeGenerateException as e:
+        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
+    except Exception as e:
+        print '[Exception]: message > {message}'.format(message=e.message)
+    else:
+        file_out = 'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M'))
     write_out_file(file_out, result)
 
     print 'done'

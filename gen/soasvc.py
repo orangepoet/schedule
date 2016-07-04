@@ -1,31 +1,23 @@
 # encoding: utf-8
 # -*- coding: utf-8 -*-
-from generate import Generator
 
+from gen import render_template, read_as_json, write_out_file, CodeGenerateException
 
-class SoaServiceGenerator(Generator):
-    template_name = 'soaservice.html'
-
-    def __init__(self, model):
-        super(SoaServiceGenerator, self).__init__()
-        self.__model = model
-
-    def _get_models(self):
-        return self.__model
+template_name = 'soaservice.html'
 
 
 def main():
-    from os.path import join, abspath
-    from json import load
+    model = read_as_json('soaservice.txt')
 
-    in_path = join(abspath('..'), 'static/in/soaservice.txt')
-    with open(in_path, 'r') as fp:
-        model = load(fp)
-
-    result = SoaServiceGenerator(model).generate()
-    out_path = join(abspath('..'), 'static/out/soaservice.txt')
-    with open(out_path, 'w+') as fp:
-        fp.write(result)
+    try:
+        result = render_template(template_name, model)
+    except CodeGenerateException as e:
+        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
+    except Exception as e:
+        print '[Exception]: message > {message}'.format(message=e.message)
+    else:
+        if result:
+            write_out_file('soaservice.txt', result)
 
 
 if __name__ == '__main__':

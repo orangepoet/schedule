@@ -1,21 +1,9 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
 
-import os
+from gen import write_out_file, read_as_lines, render_template, CodeGenerateException
 
-from generate import Generator
-from gen import write_out_file, read_in_file_lines
-
-
-class EnumCodeGenerate(Generator):
-    template_name = 'enum_cast.html'
-
-    def __init__(self, model):
-        super(EnumCodeGenerate, self).__init__()
-        self.__model = model
-
-    def _get_models(self):
-        return self.__model
+template_name = 'enum_cast.html'
 
 
 def get_enum_name(line):
@@ -28,21 +16,27 @@ def get_enum_name(line):
 
 
 def main():
-    ret = {'name': '', 'enum_items': []}
-    lines = read_in_file_lines('enum2.txt')
-    ret['name'] = get_enum_name(lines[0])
+    model = {'name': '', 'enum_items': []}
+    lines = read_as_lines('enum2.txt')
+    model['name'] = get_enum_name(lines[0])
 
     for line in lines:
         if '=' in line:
             fields = line.strip().strip(',').split('=')
             if 'unknown' == fields[0].strip().lower():
                 continue
-            ret['enum_items'].append({
+            model['enum_items'].append({
                 'name': fields[0].strip(),
                 'value': fields[1].strip()
             })
-    result = EnumCodeGenerate(ret).generate()
-    write_out_file('enum_cast.txt', result)
+    try:
+        result = render_template(template_name, model)
+    except CodeGenerateException as e:
+        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
+    except Exception as e:
+        print '[Exception]: message > {message}'.format(message=e.message)
+    else:
+        write_out_file('enum_cast.txt', result)
 
     print 'done'
 
