@@ -8,8 +8,8 @@ from generate import Generator, CodeGenerateException
 __author__ = 'chengz'
 
 
-class XContractGenerate(Generator):
-    template_name = 'xcontract.html'
+class ContractXmlGenerate(Generator):
+    template_name = 'ctcxml.html'
 
     def __init__(self, model):
         self.__model = model
@@ -185,7 +185,7 @@ def main():
                 model = get_sheet_data(sheet)
                 model['base'] = {'name': svc_info['name'], 'code': svc_info['code'], 'desc': svc_info['desc']}
 
-                result = XContractGenerate(model).generate()
+                result = ContractXmlGenerate(model).generate()
             except ExcelFormatException:
                 print 'error: ', 'excel format error'
             except CodeGenerateException as e:

@@ -1,0 +1,10 @@
+/// <summary>
+/// 未知
+/// </summary>
+Unknown = 0,
+{% for item in model %}
+/// <summary>
+/// {{ item.desc }}
+/// </summary>
+{{ item.name }} = {{ item.value }},
+{% endfor %}

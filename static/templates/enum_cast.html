@@ -17,3 +17,13 @@ switch(type)
     default:
         throw new ArgumentOutOfRangeException("type");
 }
+
+switch(str)
+{
+    {% for item in model.enum_items  -%}
+    case "{{ item.name.upper() }}":
+        return {{model.name}}.{{ item.name }};
+    {% endfor -%}
+    default:
+        return {{model.name}}.Unknown;
+}

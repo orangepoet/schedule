@@ -7,7 +7,7 @@ from generate import Generator
 
 
 class ContractGenerator(Generator):
-    template_name = 'contract.html'
+    template_name = 'ctccode.html'
 
     def __init__(self, dict_contract):
         super(ContractGenerator, self).__init__()
@@ -69,7 +69,7 @@ class ContractGenerator(Generator):
 
     @staticmethod
     def escape(attrib_val):
-        return str(attrib_val).replace('\\', '/').replace('"','\\"')
+        return str(attrib_val).replace('\\', '/').replace('"', '\\"')
 
     @staticmethod
     def __to_format(fmt):
