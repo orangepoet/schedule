@@ -4,6 +4,7 @@ import glob
 import os
 
 import shutil
+from os.path import join
 from xml.etree import ElementTree as et
 
 
@@ -42,7 +43,8 @@ class SvcDebugger(object):
         self.__adjust_code()
 
     def __config_profile(self):
-        config_profile = '{}/{}'.format(self.m_root, self.m_config_profile)
+
+        config_profile = join(self.m_root, self.m_config_profile)
         config_tree = et.parse(config_profile)
         root = config_tree.getroot()
         sect_defv = root.find('dev')
@@ -59,17 +61,18 @@ class SvcDebugger(object):
 
     def __adjust_code(self):
         lines = []
-        m_file_path = '%s/%s' % (self.m_root, self.__global_file)
-        with open(m_file_path, 'r') as f:
-            for index, value in enumerate(f.readlines()):
-                if index == 15 or index == 17:  # line number
-                    lines.append('//' + value)
+        m_file_path = join(self.m_root, self.__global_file)
+        with open(m_file_path, 'r') as fp:
+            for line in fp.readlines():
+                if 'ThreadPool.SetMaxThreads' in line and not '//' in line:
+                    lines.append('//' + line)
+                elif 'PreparedCacheManager' in line and not '//' in line:
+                    lines.append('//' + line)
                 else:
-                    lines.append(value)
-        with open(m_file_path, 'w+') as f:
+                    lines.append(line)
+        with open(m_file_path, 'w+') as fp:
             for l in lines:
-                f.write(l)
-            f.close()
+                fp.write(l)
 
 
 class SvcUpdater(object):
