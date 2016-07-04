@@ -1,169 +1,132 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
-import glob
-import os
 
-import shutil
 from os.path import join
 from xml.etree import ElementTree as et
 
+from config import copy
 
-class Files:
-    def __init__(self):
-        pass
+dir_api = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi'
+dir_api_web = dir_api + '/Server.Web/'
+dir_dst = 'd:/WebSites/SvcTest'
+file_config_profile = 'ConfigProfile.xml'
+file_global_asax = 'Global.asax.cs'
 
-    @staticmethod
-    def copy(src_dir, dst_dir, suffix):
-        if not os.path.isdir(src_dir):
-            raise 'not a directory'
-
-        if not os.path.exists(dst_dir):
-            os.mkdir(dst_dir)
-
-        for file in glob.iglob(os.path.join(src_dir, suffix)):
-            shutil.copy(file, dst_dir)
-            print('copy {0} to {1}'.format(file, dst_dir))
-
-    @staticmethod
-    def delete(dir, files):
-        for f in files:
-            os.remove(os.path.join(dir, f))
-
-
-class SvcDebugger(object):
-    m_root = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi/Server.Web/'
-    m_config_profile = 'ConfigProfile.xml'
-    __global_file = 'Global.asax.cs'
-
-    def __init__(self, env):
-        self.__env = env
-
-    def prepare(self):
-        self.__config_profile()
-        self.__adjust_code()
-
-    def __config_profile(self):
-
-        config_profile = join(self.m_root, self.m_config_profile)
-        config_tree = et.parse(config_profile)
-        root = config_tree.getroot()
-        sect_defv = root.find('dev')
-
-        if self.__env == 'fat':
-            dst_env = root.find('fat')
-        elif self.__dev == 'uat':
-            dst_env = root.find('uat_nt')
-        else:
-            raise ValueError('env is invalid')
-
-        sect_defv.clear()
-        for e in dst_env.getchildren():
-            sect_defv.append(e)
-        config_tree.write(config_profile)
-
-    def __adjust_code(self):
-        lines = []
-        m_file_path = join(self.m_root, self.__global_file)
-        with open(m_file_path, 'r') as fp:
-            for line in fp.readlines():
-                if 'ThreadPool.SetMaxThreads' in line and not '//' in line:
-                    lines.append('//' + line)
-                elif 'PreparedCacheManager' in line and not '//' in line:
-                    lines.append('//' + line)
-                else:
-                    lines.append(line)
-        with open(m_file_path, 'w+') as fp:
-            for l in lines:
-                fp.write(l)
-
-
-class SvcUpdater(object):
-    src_dir = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi'
-    dst_dir = 'd:/WebSites/SvcTest'
-
-    def __init__(self):
-        pass
-
-    global config
-
-    config = {
-        'src': {
-            'dir': src_dir,
-            'contract_bin': '%s/SmartTrip.DataContract/bin/Release' % src_dir,
-            'version_config': '%s/Server.Web/Config/VersionMapItem' % src_dir,
-            'service_config': '%s/Server.Web/Config/ServiceItem' % src_dir
-        },
-        'dst': {
-            'dir': dst_dir,
-            'bin_dir': '%s/bin' % dst_dir,
-            'version_config': '%s/Config/VersionMapItem' % dst_dir,
-            'service_config': '%s/Config/ServiceItem' % dst_dir
-        }
+config = {
+    'src': {
+        'dir': dir_api,
+        'contract_bin': '{dir}/SmartTrip.DataContract/bin/Release'.format(dir=dir_api),
+        'version_config': '{dir}/Server.Web/Config/VersionMapItem'.format(dir=dir_api),
+        'service_config': '{dir}/Server.Web/Config/ServiceItem'.format(dir=dir_api)
+    },
+    'dst': {
+        'dir': dir_dst,
+        'bin_dir': '{dir}/bin'.format(dir=dir_dst),
+        'version_config': '{dir}/Config/VersionMapItem'.format(dir=dir_dst),
+        'service_config': '{dir}/Config/ServiceItem'.format(dir=dir_dst)
     }
+}
 
-    def __copy_dll(self):
-        try:
-            src = config['src']['contract_bin']
-            dst = config['dst']['bin_dir']
-            Files.copy(src, dst, "*.dll")
-            return True
-        except:
-            print 'copy_dll failed.'
-            return False
 
-    def __copy_version_config(self):
-        try:
-            src = config['src']['version_config']
-            dst = config['dst']['version_config']
-            Files.copy(src, dst, "*.xml")
-            return True
-        except:
-            print 'copy_version_config failed.'
-            return False
+class SvcCopyException(Exception):
+    def __init__(self, dir):
+        super(SvcCopyException, self).__init__()
+        self._dir = dir
 
-    def __copy_service_config(self):
-        try:
-            src = config['src']['service_config']
-            dst = config['dst']['service_config']
-            Files.copy(src, dst, "*.xml")
-            return True
-        except:
-            print 'copy_service_config failed.'
-            return False
+    @property
+    def dir(self):
+        return self._dir
 
-    def upd(self):
-        ret = []
-        if not self.__copy_dll():
-            ret.append('copy all failed')
-        if not self.__copy_service_config():
-            ret.append('copy service config failed')
-        if not self.__copy_version_config():
-            ret.append('copy version config failed')
-        return ret if len(ret) > 0 else None
+
+def config_profile(env):
+    file_path = join(dir_api_web, file_config_profile)
+    config_tree = et.parse(file_path)
+    root = config_tree.getroot()
+    sect_defv = root.find('dev')
+
+    if env == 'fat':
+        dst_env = root.find('fat')
+    elif env == 'uat':
+        dst_env = root.find('uat_nt')
+    else:
+        raise ValueError('env is invalid')
+
+    sect_defv.clear()
+    for e in dst_env.getchildren():
+        sect_defv.append(e)
+    config_tree.write(file_path)
+
+
+def adjust_code():
+    lines = []
+
+    m_file_path = join(dir_api_web, file_global_asax)
+    with open(m_file_path, 'r') as fp:
+        for line in fp.readlines():
+            if 'ThreadPool.SetMaxThreads' in line and not '//' in line:
+                lines.append('//' + line)
+            elif 'PreparedCacheManager' in line and not '//' in line:
+                lines.append('//' + line)
+            else:
+                lines.append(line)
+    with open(m_file_path, 'w+') as fp:
+        for l in lines:
+            fp.write(l)
+
+
+def copy_dll():
+    try:
+        src = config['src']['contract_bin']
+        dst = config['dst']['bin_dir']
+        copy(src, dst, "*.dll")
+        return True
+    except:
+        raise SvcCopyException("dll")
+
+
+def copy_version_config():
+    try:
+        src = config['src']['version_config']
+        dst = config['dst']['version_config']
+        copy(src, dst, "*.xml")
+    except:
+        raise SvcCopyException('version_map')
+
+
+def copy_service_config():
+    try:
+        src = config['src']['service_config']
+        dst = config['dst']['service_config']
+        copy(src, dst, "*.xml")
+    except:
+        raise SvcCopyException('service_item')
 
 
 def debug():
-    print 'env:'
-    env = raw_input()
-    SvcDebugger(env).prepare()
-
-    print 'done'
+    config_profile()
+    adjust_code()
 
 
 def update():
-    SvcUpdater().upd()
-    print 'done'
+    try:
+        copy_dll()
+        copy_service_config()
+        copy_version_config()
+    except SvcCopyException as e:
+        print 'update failed, dir: ' + e.dir
 
 
 def main():
-    print 'choose: 1: debug, 2: update'
-    case = raw_input()
-    if case == '1':
+    print 'choose: 1<debug> 2<update>'
+    choice = raw_input()
+    if choice == '1':
         debug()
-    elif case == '2':
+    elif choice == '2':
         update()
     else:
-        print 'invalid'
+        raise ValueError('invalid choice')
+
+    print 'done'
 
 
 if __name__ == '__main__':
