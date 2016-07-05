@@ -6,7 +6,7 @@ from os import listdir, mkdir
 from os.path import exists, join, splitext
 from xml.etree import ElementTree as et
 
-from gen import render_template, write_file, CodeGenerateException
+from gen import render_template, write_file
 
 template_name = 'ctccode.html'
 dir_root = 'd:/Users/chengz/Desktop/contract'
@@ -149,18 +149,12 @@ def main():
     if not exists(dir_out):
         mkdir(dir_out)
     for file_name in listdir(dir_in):
-        try:
-            model = get_ctc_types(join(dir_in, file_name))
-            result = render_template(template_name, model)
-        except CodeGenerateException as e:
-            print '[CodeGenerateException]: message > {message}'.format(message=e.message)
-        except Exception as e:
-            print '[Exception]: message > {message}'.format(message=e.message)
-        else:
-            if result:
-                (file_raw_name, extension) = splitext(file_name)
-                file_out = join(dir_out, '{file_name}.txt'.format(file_name=file_raw_name))
-                write_file(file_out, result)
+        model = get_ctc_types(join(dir_in, file_name))
+        page = render_template(template_name, model)
+        if page:
+            (file_raw_name, extension) = splitext(file_name)
+            file_out = join(dir_out, '{file_name}.txt'.format(file_name=file_raw_name))
+            write_file(file_out, page)
 
     print 'done'
 

@@ -3,9 +3,12 @@
 
 import openpyxl
 
-from gen import write_out_file, render_template, CodeGenerateException
+from gen import write_file, render_template
+from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
+excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
+sheet_name = '30302501'
 
 
 def get_xsd_type(type):
@@ -55,26 +58,14 @@ def parse_xsd(sheet_data):
 
 
 def main():
-    import time
-    from gen.ctcxml import get_sheet_data
-
-    excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-    sheet_name = '30302501'
-
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb.get_sheet_by_name(sheet_name)
     sheet_data = get_sheet_data(sheet)
     model = parse_xsd(sheet_data)
 
-    try:
-        result = render_template(template_name,model)
-    except CodeGenerateException as e:
-        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
-    except Exception as e:
-        print '[Exception]: message > {message}'.format(message=e.message)
-    else:
-        file_out = 'xsd_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M'))
-        write_out_file(file_out, result)
+    page = render_template(template_name, model)
+    if page:
+        write_file('xsd.txt', page)
 
     print 'done'
 

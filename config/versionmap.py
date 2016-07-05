@@ -6,6 +6,7 @@ file_path = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi' \
             '/Server.Web/Config/VersionMapItem/VersionMapItem.smarttrip.xml'
 item_format = unicode('  <item systemCode="{item[system_code]}" beginClientVersion="{item[version]}" ' \
                       'endClientVersion="9999"  serviceCode="{item[service_code]}" category="1" keyword="{item[keyword]}" value="{item[value]}" remark="{item[remark]}"/>\n')
+version_min = 584
 
 
 def to_items(items, sys_code):
@@ -20,8 +21,6 @@ def to_items(items, sys_code):
 def new_items():
     from json import load
     from os.path import join, abspath
-
-    version_min = 584
 
     version_map_path = join(abspath('..'), 'static/in/version_map.txt')
     with open(version_map_path, 'r') as fp:

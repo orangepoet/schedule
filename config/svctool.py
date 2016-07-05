@@ -15,27 +15,17 @@ file_global_asax = 'Global.asax.cs'
 config = {
     'src': {
         'dir': dir_api,
-        'contract_bin': '{dir}/SmartTrip.DataContract/bin/Release'.format(dir=dir_api),
-        'version_config': '{dir}/Server.Web/Config/VersionMapItem'.format(dir=dir_api),
-        'service_config': '{dir}/Server.Web/Config/ServiceItem'.format(dir=dir_api)
+        'bin': join(dir_api, 'SmartTrip.DataContract/bin/Release'),
+        'version_map': join(dir_api, '/Server.Web/Config/VersionMapItem'),
+        'service_item': join(dir_api, '/Server.Web/Config/ServiceItem')
     },
     'dst': {
         'dir': dir_dst,
-        'bin_dir': '{dir}/bin'.format(dir=dir_dst),
-        'version_config': '{dir}/Config/VersionMapItem'.format(dir=dir_dst),
-        'service_config': '{dir}/Config/ServiceItem'.format(dir=dir_dst)
+        'bin': join(dir_dst, 'bin'),
+        'version_map': join(dir_dst, 'Config/VersionMapItem'),
+        'service_item': join(dir_dst, 'Config/ServiceItem')
     }
 }
-
-
-class SvcCopyException(Exception):
-    def __init__(self, dir):
-        super(SvcCopyException, self).__init__()
-        self._dir = dir
-
-    @property
-    def dir(self):
-        return self._dir
 
 
 def config_profile(env):
@@ -74,46 +64,17 @@ def adjust_code():
             fp.write(l)
 
 
-def copy_dll():
-    try:
-        src = config['src']['contract_bin']
-        dst = config['dst']['bin_dir']
-        copy(src, dst, "*.dll")
-        return True
-    except:
-        raise SvcCopyException("dll")
-
-
-def copy_version_config():
-    try:
-        src = config['src']['version_config']
-        dst = config['dst']['version_config']
-        copy(src, dst, "*.xml")
-    except:
-        raise SvcCopyException('version_map')
-
-
-def copy_service_config():
-    try:
-        src = config['src']['service_config']
-        dst = config['dst']['service_config']
-        copy(src, dst, "*.xml")
-    except:
-        raise SvcCopyException('service_item')
+def update():
+    for src, dst in zip(config['src'].iteritems(), config['dst'].iteritems()):
+        if src[0] == 'bin':
+            copy(src[1], dst[1], '*.dll')
+        elif src[0] == 'version_map' or src[0] == 'service_item':
+            copy(src[1], dst[1], '*.xml')
 
 
 def debug():
     config_profile()
     adjust_code()
-
-
-def update():
-    try:
-        copy_dll()
-        copy_service_config()
-        copy_version_config()
-    except SvcCopyException as e:
-        print 'update failed, dir: ' + e.dir
 
 
 def main():

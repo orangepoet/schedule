@@ -1,6 +1,4 @@
-import time
-
-from gen import render_template, CodeGenerateException, write_out_file, read_as_json, read_as_lines
+from gen import render_template, write_file, read_as_json, read_as_lines
 
 template_name = 'repository.html'
 base_config = 'repo.txt'
@@ -49,16 +47,10 @@ def get_repo_model():
 
 
 def main():
-    try:
-        model = get_repo_model()
-        result = render_template(template_name, model)
-    except CodeGenerateException as e:
-        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
-    except Exception as e:
-        print '[Exception]: message > {message}'.format(message=e.message)
-    else:
-        if result:
-            write_out_file('repo_{time}.txt'.format(time=time.strftime('%Y%m%dH%H%M')), result)
+    model = get_repo_model()
+    page = render_template(template_name, model)
+    if page:
+        write_file('repo.txt', page)
 
     print 'done'
 

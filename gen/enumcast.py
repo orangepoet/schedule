@@ -1,9 +1,9 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
 
-from gen import write_out_file, read_as_lines, render_template, CodeGenerateException
+from gen import write_file, read_as_lines, render_template
 
-template_name = 'enum_cast.html'
+template_name = 'enum2.html'
 
 
 def get_enum_name(line):
@@ -29,14 +29,9 @@ def main():
                 'name': fields[0].strip(),
                 'value': fields[1].strip()
             })
-    try:
-        result = render_template(template_name, model)
-    except CodeGenerateException as e:
-        print '[CodeGenerateException]: message > {message}'.format(message=e.message)
-    except Exception as e:
-        print '[Exception]: message > {message}'.format(message=e.message)
-    else:
-        write_out_file('enum_cast.txt', result)
+    page = render_template(template_name, model)
+    if page:
+        write_file('enum_cast.txt', page)
 
     print 'done'
 

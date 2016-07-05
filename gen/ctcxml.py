@@ -2,22 +2,16 @@
 # -*- coding: uft-8 -*-
 
 import time
-from email import message
 from os import mkdir
 from os.path import exists, join
 
 import openpyxl
 
-from gen import render_template, CodeGenerateException, write_file
+from gen import render_template, write_file
 
 template_name = 'ctcxml.html'
 excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
 dir_out_format = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'
-
-
-class ExcelFormatException(Exception):
-    def __init__(self, *args, **kwargs):
-        super(ExcelFormatException, self).__init__(args, kwargs)
 
 
 def is_not_default_color(font):
@@ -89,7 +83,7 @@ def get_split_row_idx(rows, row_min, row_max):
             if not_empty_row > 1:
                 return row_idx
 
-    raise ExcelFormatException()
+    raise Exception('excel format error, not req/resp format')
 
 
 def get_square_data(header, rows, row_min, row_max, col_min, col_max):
@@ -173,15 +167,11 @@ def main():
                 sheet = wb.get_sheet_by_name(str(svc_info['code']))
                 model = get_sheet_data(sheet)
                 model['base'] = {'name': svc_info['name'], 'code': svc_info['code'], 'desc': svc_info['desc']}
-                result = render_template('', model)
-            except ExcelFormatException:
-                print '[ExcelFormatException]: message > {message}'.format(message=e.message)
-            except CodeGenerateException as e:
-                print '[CodeGenerateException]: message > {message}'.format(message=e.message)
             except Exception as e:
-                print '[Exception]: message > {message}'.format(message=e.message)
+                print e
             else:
-                if result:
+                page = render_template(template_name, model)
+                if page:
                     file_out = join(dir_out_format, '{file_name}.xml'.format(file_name=svc_info['code']))
                     write_file(file_out, model)
     print 'done'
