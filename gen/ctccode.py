@@ -153,8 +153,8 @@ def main():
         page = render_template(template_name, model)
         if page:
             (file_raw_name, extension) = splitext(file_name)
-            file_out = join(dir_out, '{file_name}.txt'.format(file_name=file_raw_name))
-            write_file(file_out, page)
+            file_name = '{}.txt'.format(file_raw_name)
+            write_file(file_name, page, dir_out)
 
     print 'done'
 

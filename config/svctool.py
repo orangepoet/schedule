@@ -16,8 +16,8 @@ config = {
     'src': {
         'dir': dir_api,
         'bin': join(dir_api, 'SmartTrip.DataContract/bin/Release'),
-        'version_map': join(dir_api, '/Server.Web/Config/VersionMapItem'),
-        'service_item': join(dir_api, '/Server.Web/Config/ServiceItem')
+        'version_map': join(dir_api, 'Server.Web/Config/VersionMapItem'),
+        'service_item': join(dir_api, 'Server.Web/Config/ServiceItem')
     },
     'dst': {
         'dir': dir_dst,
@@ -73,7 +73,16 @@ def update():
 
 
 def debug():
-    config_profile()
+    print '1<fat>, 2<uat>'
+    choice = raw_input()
+    if int(choice) == 1:
+        env = 'fat'
+    elif int(choice) == 2:
+        env = 'uat'
+    else:
+        raise ValueError('input invalid')
+
+    config_profile(env)
     adjust_code()
 
 

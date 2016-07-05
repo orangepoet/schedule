@@ -11,7 +11,7 @@ from gen import render_template, write_file
 
 template_name = 'ctcxml.html'
 excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-dir_out_format = 'd:/Users/chengz/Desktop/Contract/xml/{timestamp}'
+dir_xml_root = 'd:/Users/chengz/Desktop/Contract/xml/'
 
 
 def is_not_default_color(font):
@@ -155,9 +155,9 @@ def escape(cell_value):
 
 
 def main():
-    dir_out_path = dir_out_format.format(timestamp=time.strftime('%Y%m%dH%H%M'))
-    if not exists(dir_out_path):
-        mkdir(dir_out_path)
+    dir_out = join(dir_xml_root, time.strftime('%Y%m%dH%H%M'))
+    if not exists(dir_out):
+        mkdir(dir_out)
 
     wb = openpyxl.load_workbook(excel_path)
     for row in wb['Overview']:
@@ -172,8 +172,8 @@ def main():
             else:
                 page = render_template(template_name, model)
                 if page:
-                    file_out = join(dir_out_format, '{file_name}.xml'.format(file_name=svc_info['code']))
-                    write_file(file_out, model)
+                    file_name = '{}.xml'.format(svc_info['code'])
+                    write_file(file_name, page, dir_out)
     print 'done'
 
 

@@ -10,7 +10,6 @@ from time import strftime
 from requests import post, codes
 from requests.structures import CaseInsensitiveDict
 
-global ROOT
 ROOT = 'd:/Users/chengz/Desktop/TestCase/'
 
 

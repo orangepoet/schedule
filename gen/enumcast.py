@@ -17,7 +17,7 @@ def get_enum_name(line):
 
 def main():
     model = {'name': '', 'enum_items': []}
-    lines = read_as_lines('enum2.txt')
+    lines = read_as_lines('enumcast.txt')
     model['name'] = get_enum_name(lines[0])
 
     for line in lines:

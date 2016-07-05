@@ -13,32 +13,36 @@ sys.setdefaultencoding("utf-8")
 env = Environment(loader=FileSystemLoader(join(abspath('..'), 'static/templates')))
 
 
-def read_as_lines(file_name, dir_path=None):
-    if not dir_path:
-        dir_path = join(abspath('..'), 'static/in')
-    elif not exists(dir_path):
-        raise ValueError('dir path not exists')
-    with open(join(dir_path, file_name), 'r') as fp:
-        return fp.readlines()
-
-
-def read_as_json(file_name, dir_path=None):
-    if not dir_path:
-        dir_path = join(abspath('..'), 'static/in')
-    elif not exists(dir_path):
-        raise ValueError('dir path not exists')
-    with open(join(dir_path, file_name), 'r') as fp:
-        return load(fp)
-
-
-def write_file(file_name, out, dir_path='in'):
+def read_as_lines(file_name, dir_path='in'):
     if dir_path == 'in':
         file_path = join(abspath('..'), 'static/in', file_name)
     else:
+        if not exists(dir_path):
+            raise ValueError('dir path not exists')
         file_path = join(dir_path, file_name)
-    if not exists(file_path):
-        raise ValueError('file not exists, path: {path}'.format(file_path))
-    with open(join(dir_path, file_name), 'w+') as fp:
+    with open(file_path, 'r') as fp:
+        return fp.readlines()
+
+
+def read_as_json(file_name, dir_path='in'):
+    if dir_path == 'in':
+        file_path = join(abspath('..'), 'static/in', file_name)
+    else:
+        if not exists(dir_path):
+            raise ValueError('dir path not exists')
+        file_path = join(dir_path, file_name)
+    with open(file_path, 'r') as fp:
+        return load(fp)
+
+
+def write_file(file_name, out, dir_path='out'):
+    if dir_path == 'out':
+        file_path = join(abspath('..'), 'static/out', file_name)
+    else:
+        if not exists(dir_path):
+            raise ValueError('dir path not exists')
+        file_path = join(dir_path, file_name)
+    with open(file_path, 'w+') as fp:
         fp.write(out)
 
 

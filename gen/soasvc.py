@@ -9,9 +9,9 @@ template_name = 'soaservice.html'
 def main():
     model = read_as_json('soaservice.txt')
 
-    result = render_template(template_name, model)
-    if result:
-        write_file('soaservice.txt', result)
+    page = render_template(template_name, model)
+    if page:
+        write_file('soaservice.txt', page)
 
 
 if __name__ == '__main__':
