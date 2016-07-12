@@ -1,4 +1,4 @@
-{% for type in model %}
+{%- for type in model %}
 <xs:complexType name="{{ type.name }}">
     <xs:sequence>
     {%- for element in type.elements %}
@@ -10,4 +10,4 @@
     {%- endfor %}
     </xs:sequence>
 </xs:complexType>
-{% endfor %}
+{% endfor -%}

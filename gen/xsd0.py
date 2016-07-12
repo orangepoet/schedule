@@ -7,22 +7,18 @@ from gen import write_file, render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
-excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-sheet_name = '30300601'
+excel_path = unicode(r'D:\schedule\doc\ctc\H5Api\H5Api.xlsx')
+sheet_name = 'ShortUrlGet'
 
 
 def get_xsd_type(metadata, ctctype):
     if ctctype is None:
         ret = {
-            'dynamic': 'xs:string',
-            'int4': 'xs:int',
-            'int10': 'xs:int',
-            'int20': 'xs:long',
-            'boolean': 'xs:boolean',
-            'decimal2': 'xs:decimal',
-            'decimal6': 'xs:decimal',
-            'datetime':'xs:dateTime',
-            'code2':'string'
+            'string': 'xs:string',
+            'int': 'xs:int',
+            'bool': 'xs:boolean',
+            'datetime': 'xs:dateTime',
+            'long': 'xs:long'
         }[str(metadata).lower()]
     else:
         ret = ctctype + 'Type'
@@ -33,7 +29,7 @@ def get_elements(children):
     ret = []
     for child in children:
         ret.append({
-            'name': child.get('short_name'),
+            'name': child.get('name'),
             'type': get_xsd_type(child.get('metadata'), child.get('type')),
             'minOccurs': '1' if child.get('required') == 'Y' else '0',
             'maxOccurs': 'unbounded' if 'List' in child.get('metadata') else '1',
@@ -61,16 +57,48 @@ def parse_xsd_type(xls_obj):
     return ret
 
 
+def add_request_head(request):
+    request['elements'].insert(0, {
+        'name': 'head',
+        'type': 'mobileCommon:MobileRequestHead',
+        'minOccurs': '1',
+        'maxOccurs': '1',
+        'desc': unicode('请求头部')
+    })
+
+
+def add_response_status(response):
+    response['elements'].insert(0, {
+        'name': 'ResponseStatus',
+        'type': 'common:ResponseStatusType',
+        'minOccurs': '1',
+        'maxOccurs': '1',
+        'desc': unicode('服务响应状态')
+    })
+
+
+def post_execute(complex_types):
+    for ct in complex_types:
+        if ct['name'].endswith('RequestType'):
+            add_request_head(ct)
+        elif ct['name'].endswith('ResponseType'):
+            add_response_status(ct)
+    pass
+
+
 def parse_xsd(sheet_data):
     ret = []
     ret.extend(parse_xsd_type(sheet_data['req']))
     ret.extend(parse_xsd_type(sheet_data['resp']))
+
+    post_execute(ret)
+
     return ret
 
 
 def main():
     """
-    针对SOTP协议客户端契约生产的XSD, 注意: 请使用xsd0生成XSD如果是为H5生成XSD
+    针对H5Api.xlsx 生成XSD代码
     """
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb.get_sheet_by_name(sheet_name)
@@ -79,7 +107,7 @@ def main():
 
     page = render_template(template_name, xsd_types)
     if page:
-        write_file('xsd2.txt', page)
+        write_file('xsd0.txt', page)
 
     print 'done'
 

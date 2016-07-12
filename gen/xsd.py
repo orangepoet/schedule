@@ -7,8 +7,8 @@ from gen import write_file, render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
-excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-sheet_name = '30302501'
+excel_path = unicode(r'D:\schedule\doc\ctc\H5Api\H5Api.xlsx')
+sheet_name = 'FlightVarMessageSearch'
 
 
 def get_xsd_type(type):

@@ -73,7 +73,7 @@ def update():
 
 
 def debug():
-    print '1<fat>, 2<uat>'
+    print 'fat:1, uat:2'
     choice = raw_input()
     if int(choice) == 1:
         env = 'fat'
@@ -87,7 +87,7 @@ def debug():
 
 
 def main():
-    print 'choose: 1<debug> 2<update>'
+    print 'debug:1, update:2'
     choice = raw_input()
     if choice == '1':
         debug()
