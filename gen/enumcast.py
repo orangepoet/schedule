@@ -3,7 +3,7 @@
 
 from gen import write_file, read_as_lines, render_template
 
-template_name = 'enum2.html'
+template_name = 'enumcast.html'
 
 
 def get_enum_name(line):
@@ -31,7 +31,7 @@ def main():
             })
     page = render_template(template_name, model)
     if page:
-        write_file('enum_cast.txt', page)
+        write_file('enumcast.txt', page)
 
     print 'done'
 

@@ -2,7 +2,7 @@ switch(value)
 {
     {% for item in model.enum_items -%}
     case {{ item.value }}:
-        return {{model.name}}.{{item.name}}
+        return {{model.name}}.{{item.name}};
     {% endfor -%}
     default:
         return {{model.name}}.Unknown;
