@@ -3,19 +3,21 @@
 
 import sys
 from json import load
-from os.path import join, abspath, exists
+from os.path import join, exists
 
 from jinja2 import Environment, FileSystemLoader
+
+from app import BARE_DIR
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
-env = Environment(loader=FileSystemLoader(join(abspath('..'), 'static/templates')))
+env = Environment(loader=FileSystemLoader(join(BARE_DIR, 'static/templates')))
 
 
 def read_as_lines(file_name, dir_path='in'):
     if dir_path == 'in':
-        file_path = join(abspath('..'), 'static/in', file_name)
+        file_path = join(BARE_DIR, 'static/in', file_name)
     else:
         if not exists(dir_path):
             raise ValueError('dir path not exists')
@@ -26,7 +28,7 @@ def read_as_lines(file_name, dir_path='in'):
 
 def read_as_json(file_name, dir_path='in'):
     if dir_path == 'in':
-        file_path = join(abspath('..'), 'static/in', file_name)
+        file_path = join(BARE_DIR, 'static/in', file_name)
     else:
         if not exists(dir_path):
             raise ValueError('dir path not exists')
@@ -37,7 +39,7 @@ def read_as_json(file_name, dir_path='in'):
 
 def write_file(file_name, out, dir_path='out'):
     if dir_path == 'out':
-        file_path = join(abspath('..'), 'static/out', file_name)
+        file_path = join(BARE_DIR, 'static/out', file_name)
     else:
         if not exists(dir_path):
             raise ValueError('dir path not exists')

@@ -181,7 +181,7 @@ def check_by_new_contract_xml():
                     print 'error: verion map lose platform{sys_code}, service: {service}'.format(sys_code=needed,
                                                                                                  service=service_code)
         if service_code not in register_services:
-            print 'error: new service not regiter'
+            print 'error: new service not regiter, service code: {svc_code}'.format(svc_code=service_code)
 
     print 'check_by_new_contract_xml end'
 

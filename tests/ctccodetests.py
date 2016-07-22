@@ -6,7 +6,7 @@ import unittest
 from mock import MagicMock
 
 import gen.ctccode as client
-import foo as client2
+from gen import foo as client2
 
 
 class CTCCodeTestCase(unittest.TestCase):

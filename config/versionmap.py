@@ -1,6 +1,6 @@
 # -*- encoding:utf-8 -*-
 # -*- coding: uft-8 -*-
-
+from app import BARE_DIR
 
 file_path = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi' \
             '/Server.Web/Config/VersionMapItem/VersionMapItem.smarttrip.xml'
@@ -20,9 +20,9 @@ def to_items(items, sys_code):
 
 def new_items():
     from json import load
-    from os.path import join, abspath
+    from os.path import join
 
-    version_map_path = join(abspath('..'), 'static/in/version_map.txt')
+    version_map_path = join(BARE_DIR, 'static/in/version_map.txt')
     with open(version_map_path, 'r') as fp:
         ret = load(fp)
         if ret:

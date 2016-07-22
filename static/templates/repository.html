@@ -19,20 +19,20 @@ namespace {{model.namespace}}
         public static IList<{{model.entity}}> QueryAll()
         {
             List<{{model.entity}}> result;
-            DataSet dsSmartTrip;
+            DataSet ds;
 
             result = new List<{{model.entity}}>();
             try
             {
-                dsSmartTrip = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
+                ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
                         "Select_All_{{model.name}}",
                         CommandType.Text,
                         c_Select_All_{{model.name}},
                         null);
 
-                if (DataTableHelper.HasRow(dsSmartTrip))
+                if (DataTableHelper.HasRow(ds))
                 {
-                    foreach (DataRow row in dsSmartTrip.Tables[0].Rows)
+                    foreach (DataRow row in ds.Tables[0].Rows)
                     {
                         if (row != null)
                         {

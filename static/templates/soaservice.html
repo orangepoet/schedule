@@ -22,9 +22,9 @@ namespace Ctrip.Mobile.Server.SmartTrip.ServiceCore.SoaServices
 
     {% if model.service.response.types %}
     {% for type in model.service.response.types %}
-    internal sealed class {{ type.name }} 
+    internal sealed class {{ type.name }}
     {
-        {% for key,value in type.props %}
+        {% for key,value in type.props.iteritems() %}
         public {{value}} {{ key}} { get; set; }
         {% endfor %}
     }

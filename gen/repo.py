@@ -33,15 +33,15 @@ def get_db_type(dbtype):
 def get_repo_model():
     ret = []
 
-    base_ = read_as_json(base_config)
+    _base = read_as_json(base_config)
     for line in read_as_lines(tb_config):
         ret.append(get_line_fields(line))
 
     return {
-        'name': base_['name'],
-        'entity': base_['entity'],
-        'table': base_['table'],
-        'namespace': base_['namespace'],
+        'name': _base['name'],
+        'entity': _base['entity'],
+        'table': _base['table'],
+        'namespace': _base['namespace'],
         'fields': ret
     }
 

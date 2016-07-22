@@ -10,8 +10,6 @@ from gen import render_template, write_file
 
 template_name = 'ctccode.html'
 dir_root = 'd:/Users/chengz/Desktop/contract'
-dir_name = 'dst'
-
 
 def escape(attrib_val):
     return str(attrib_val).replace('\\', '/').replace('"', '\\"')
@@ -140,7 +138,7 @@ def get_ctc_types(xml_path):
 
 
 def main():
-    dir_in = join(dir_root, 'xml', dir_name)
+    dir_in = join(dir_root, 'xml', 'dst')
     dir_out = join(dir_root, 'code', time.strftime('%Y%m%dH%H%M'))
 
     if not exists(dir_in):

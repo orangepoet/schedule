@@ -8,7 +8,7 @@ from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
 excel_path = unicode(r'D:\schedule\doc\ctc\H5Api\H5Api.xlsx')
-sheet_name = 'BrowseHistoryGet'
+sheet_name = 'UserTravelHistorySearch'
 
 
 def get_xsd_type(metadata, ctctype):
@@ -18,7 +18,9 @@ def get_xsd_type(metadata, ctctype):
             'int': 'xs:int',
             'bool': 'xs:boolean',
             'datetime': 'xs:dateTime',
-            'long': 'xs:long'
+            'long': 'xs:long',
+            'decimal': 'xs:decimal',
+            'decimal6': 'xs:decimal'
         }[str(metadata).lower()]
     else:
         ret = ctctype + 'Type'
@@ -32,10 +34,16 @@ def get_elements(children):
             'name': child.get('name'),
             'type': get_xsd_type(child.get('metadata'), child.get('type')),
             'minOccurs': '1' if child.get('required') == 'Y' else '0',
-            'maxOccurs': 'unbounded' if 'List' in child.get('metadata') else '1',
+            'maxOccurs': 'unbounded' if is_collection(child.get('metadata')) else '1',
             'desc': child.get('remark')
         })
     return ret
+
+
+def is_collection(metadata):
+    if not isinstance(metadata, basestring):
+        return False
+    return metadata.lower() in ('list', 'array')
 
 
 def parse_xsd_type(xls_obj):
@@ -107,7 +115,7 @@ def main():
 
     page = render_template(template_name, xsd_types)
     if page:
-        write_file('xsd0.txt', page)
+        write_file('xsd.txt', page)
 
     print 'done'
 
