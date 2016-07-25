@@ -65,7 +65,7 @@ namespace {{model.namespace}}
                 ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
                         "Select_{{model.name}}_ById",
                         CommandType.Text,
-                        c_Select_All_{{model.name}}_ById,
+                        c_Select_{{model.name}}_ById,
                         parameter);
 
                 if (DataTableHelper.HasRow(ds))
