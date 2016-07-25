@@ -7,11 +7,12 @@ from os.path import exists, join
 
 import openpyxl
 
+from app import get_config
 from gen import render_template, write_file
 
 template_name = 'ctcxml.html'
-excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-dir_xml_root = 'd:/Users/chengz/Desktop/Contract/xml/'
+excel_path = unicode(get_config(__file__, 'excel_path'))
+xml_root = get_config(__file__, 'xml_root')
 
 
 def is_not_default_color(font):
@@ -155,7 +156,7 @@ def escape(cell_value):
 
 
 def main():
-    dir_out = join(dir_xml_root, time.strftime('%Y%m%dH%H%M'))
+    dir_out = join(xml_root, time.strftime('%Y%m%dH%H%M'))
     if not exists(dir_out):
         mkdir(dir_out)
 

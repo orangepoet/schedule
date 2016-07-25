@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-__author__ = 'chengz'
-
 from os import listdir
 from xml.etree import ElementTree as et
 
-current_version = 619
-new_contract_dir = r'd:\Users\chengz\Desktop\Contract\xml\dst'
+from app import get_config
+
+current_version = int(get_config(__file__, 'version'))
+dir_ctc = get_config(__file__, 'contract_dir')
+mini_version_value = 584
 
 
 def get_service_config():
@@ -88,7 +89,7 @@ def get_version_map_items():
         # validations
         if sys_code not in [9, 12, 32, 42, 43]:
             raise ValueError('systemCode out of range' + item_string_format)
-        if begin_version > 600 and begin_version - 584 != version_val:
+        if begin_version > 600 and begin_version - mini_version_value != version_val:
             raise ValueError('value not match beginClientVersion' + item_string_format)
         if end_version != 9999:
             raise ValueError('endClientVersion is not 9999' + item_string_format)
@@ -124,13 +125,13 @@ def check_version_map(lst_contract_service_item):
     pass
 
 
-def get_new_contract_code_list():
-    return (current_version, [int(service_code.replace('.xml', '')) for service_code in listdir(new_contract_dir)])
+def get_new_contract_code_list(version, dir_ctc):
+    return (version, [int(service_code.replace('.xml', '')) for service_code in listdir(dir_ctc)])
 
 
 def check_by_contract_code():
-    print '--------------------------------------'
     print 'check_by_contract_code'
+    print '--------------------------------------'
 
     service_config = get_service_config()
 
@@ -146,7 +147,7 @@ def check_by_contract_code():
     if lst_svc_ver_data:
         check_version_map(lst_svc_ver_data)
 
-    print 'check_by_contract_code end'
+    print '--- end ---\n'
 
 
 def get_register_services():
@@ -157,14 +158,14 @@ def get_register_services():
 
 
 def check_by_new_contract_xml():
-    print '--------------------------------------'
     print 'check_by_new_contract_xml'
+    print '--------------------------------------'
 
     register_services = get_register_services()
 
     version_map_items = get_version_map_items()
-    new_contracts = get_new_contract_code_list()
-    version_value = new_contracts[0] - 584
+    new_contracts = get_new_contract_code_list(current_version, dir_ctc)
+    version_value = new_contracts[0] - mini_version_value
     if not version_map_items.has_key(version_value):
         print 'error: version map lose new service all'
     for service_code in new_contracts[1]:
@@ -183,10 +184,11 @@ def check_by_new_contract_xml():
         if service_code not in register_services:
             print 'error: new service not regiter, service code: {svc_code}'.format(svc_code=service_code)
 
-    print 'check_by_new_contract_xml end'
+    print '--- end ---\n'
 
 
 def main():
+    print 'current version: ', int(current_version)-mini_version_value,'\n'
     check_by_contract_code()
     check_by_new_contract_xml()
 

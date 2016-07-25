@@ -4,6 +4,7 @@
 from os.path import join
 from xml.etree import ElementTree as et
 
+from app import get_config
 from config import copy
 
 dir_api = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi'
@@ -11,6 +12,8 @@ dir_api_web = dir_api + '/Server.Web/'
 dir_dst = 'd:/WebSites/SvcTest'
 file_config_profile = 'ConfigProfile.xml'
 file_global_asax = 'Global.asax.cs'
+command = get_config(__file__, 'command')
+env = get_config(__file__, 'env')
 
 config = {
     'src': {
@@ -72,26 +75,15 @@ def update():
             copy(src[1], dst[1], '*.xml')
 
 
-def debug():
-    print 'fat:1, uat:2'
-    choice = raw_input()
-    if int(choice) == 1:
-        env = 'fat'
-    elif int(choice) == 2:
-        env = 'uat'
-    else:
-        raise ValueError('input invalid')
-
+def debug(env):
     config_profile(env)
     adjust_code()
 
 
 def main():
-    print 'debug:1, update:2'
-    choice = raw_input()
-    if choice == '1':
-        debug()
-    elif choice == '2':
+    if command == '1':
+        debug(env)
+    elif command == '2':
         update()
     else:
         raise ValueError('invalid choice')
