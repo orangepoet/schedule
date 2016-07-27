@@ -1,0 +1,7 @@
+{%- if item.children %}
+    <item index="{{loop.index0}}" name="{{ item.name }}" shortName="{{ item.short_name }}" length="" require="{{ 'True' if item.required == 'Y' else 'False' }}" type="{{ item.type }}" metadata="{{ item.metadata }}" description="{{ item.remark }}" format="{{ item.range }}" version="{{ item.version if item.version else 0 }}">
+        {{ loop(item.children) }}
+    </item>
+{%- else %}
+    <item index="{{loop.index0}}" name="{{ item.name }}" shortName="{{ item.short_name }}" length="" require="{{ 'True' if item.required == 'Y' else 'False' }}" type="{{ item.type }}" metadata="{{ item.metadata }}" description="{{ item.remark }}" format="{{ item.range }}" version="{{ item.version if item.version else 0 }}"/>
+{%- endif %}

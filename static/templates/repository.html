@@ -1,10 +1,11 @@
 using System;
 using System.Data;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 using Ctrip.Mobile.Server.SmartTrip.Common.Utility;
 using Ctrip.Mobile.Server.SmartTrip.Common.Error;
-using System.Diagnostics;
+using Ctrip.Mobile.DBAccess;
 
 namespace {{model.namespace}}
 {
@@ -16,21 +17,37 @@ namespace {{model.namespace}}
     }
     public static class {{model.name}}Repository
     {
-        public static IList<{{model.entity}}> QueryAll()
+        public static IList<{{model.entity}}> QueryTopN(int maxCount, {{model.fields[0].ctype}} {{model.fields[0].name|lower}})
         {
+            if (maxCount <= 0)
+            {
+                throw new ArgumentOutOfRangeException("maxCount");
+            }
+            if ({{model.fields[0].name|lower}} < 0)
+            {
+                throw new ArgumentOutOfRangeException("{{model.fields[0].name|lower}}");
+            }
+
             List<{{model.entity}}> result;
+            DataParameterCollection parameters;
             DataSet ds;
 
+            parameters = new DataParameterCollection();
+            parameters.Add("{{model.fields[0].name}}", DbType.{{model.fields[0].dtype}}, {{model.fields[0].name|lower}});
             result = new List<{{model.entity}}>();
             try
             {
                 ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
-                        "Select_All_{{model.name}}",
+                        "Select_TopN_ViewedFavoriteHotel",
                         CommandType.Text,
-                        c_Select_All_{{model.name}},
-                        null);
+                        string.Format(c_select_TopN_{{ model.name }}, maxCount.ToString()),
+                        parameters);
 
-                if (DataTableHelper.HasRow(ds))
+                if (ds != null &&
+                    ds.Tables.Count > 0 &&
+                    ds.Tables[0] != null &&
+                    ds.Tables[0].Rows != null &&
+                    ds.Tables[0].Rows.Count > 0)
                 {
                     foreach (DataRow row in ds.Tables[0].Rows)
                     {
@@ -48,27 +65,67 @@ namespace {{model.namespace}}
             return result;
         }
 
-        public static {{model.entity}} Query({{model.fields[0].ctype}} {{model.fields[0].name}})
+        public static IList<{{model.entity}}> QueryAll()
         {
-            if({{model.fields[0].name}} <= 0)
+            List<{{model.entity}}> result;
+            DataSet ds;
+
+            result = new List<{{model.entity}}>();
+            try
             {
-                throw new ArgumentOutOfRangeException("{{model.fields[0].name}}");
+                ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
+                        "Select_All_{{model.name}}",
+                        CommandType.Text,
+                        c_select_All_{{model.name}},
+                        null);
+
+                if (ds != null &&
+                    ds.Tables.Count > 0 &&
+                    ds.Tables[0] != null &&
+                    ds.Tables[0].Rows != null &&
+                    ds.Tables[0].Rows.Count > 0)
+                {
+                    foreach (DataRow row in ds.Tables[0].Rows)
+                    {
+                        if (row != null)
+                        {
+                            result.Add(ToEntity(row));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException(ServiceErrorCode.DBUnknowError, ServiceErrorMessage.DBUnknowError, ex);
+            }
+            return result;
+        }
+
+        public static {{model.entity}} Query({{model.fields[0].ctype}} {{model.fields[0].name|lower}})
+        {
+            if({{model.fields[0].name|lower}} <= 0)
+            {
+                throw new ArgumentOutOfRangeException("{{model.fields[0].name|lower}}");
             }
 
             DataParameterCollection parameter;
             DataSet ds;
 
             parameter = new DataParameterCollection();
-            parameter.Add("{{model.fields[0].name}}", DbType.{{model.fields[0].dtype}}, {{model.fields[0].name}});
+            parameter.Add("{{model.fields[0].name}}", DbType.{{model.fields[0].dtype}}, {{model.fields[0].name|lower}});
             try
             {
                 ds = SmartTripDBAccessManager.SmartTripDB.ExecuteDataSet(
                         "Select_{{model.name}}_ById",
                         CommandType.Text,
-                        c_Select_{{model.name}}_ById,
+                        c_select_{{model.name}}_ById,
                         parameter);
 
-                if (DataTableHelper.HasRow(ds))
+                if (ds != null &&
+                    ds.Tables.Count > 0 &&
+                    ds.Tables[0] != null &&
+                    ds.Tables[0].Rows != null &&
+                    ds.Tables[0].Rows.Count > 0)
                 {
                     return ToEntity(ds.Tables[0].Rows[0]);
                 }
@@ -128,6 +185,25 @@ namespace {{model.namespace}}
                 parameters);
         }
 
+        public static void Delete(long {{model.fields[0].name|lower}})
+        {
+            if({{model.fields[0].name|lower}} <= 0)
+            {
+                throw new ArgumentOutOfRangeException("{{model.fields[0].name|lower}}");
+            }
+
+            DataParameterCollection parameters;
+
+            parameters = new DataParameterCollection();
+            parameters.Add("{{model.fields[0].name}}", DbType.{{model.fields[0].dtype}}, {{model.fields[0].name|lower}});
+
+            SmartTripDBAccessManager.SmartTripDB.ExecuteNonQuery(
+                c_sqlDelete /*sqlName*/,
+                CommandType.StoredProcedure,
+                c_sqlDelete /*sqlCommand*/,
+                parameters);
+        }
+
         private static {{model.entity}} ToEntity(DataRow row)
         {
             Debug.Assert(row != null);
@@ -140,7 +216,19 @@ namespace {{model.namespace}}
             };
         }
 
-        private const string c_Select_All_{{model.name}} = @"
+        private const string c_select_TopN_{{ model.name }} = @"
+SELECT TOP {0}
+{%- for f in model.fields %}
+{%- if not loop.first -%}
+,
+{%- endif %}
+    [{{f.name}}]
+{%- endfor %}
+FROM [{{model.table}}] WITH(NOLOCK)
+ORDER BY {{model.fields[0].name}}
+";
+
+        private const string c_select_All_{{model.name}} = @"
 SELECT
 {%- for f in model.fields %}
 {%- if not loop.first -%}
@@ -151,7 +239,7 @@ SELECT
 FROM [{{model.table}}] WITH(NOLOCK)
 ";
 
-        private const string c_Select_All_{{model.name}}_ById = @"
+        private const string c_select_{{model.name}}_ById = @"
 SELECT
 {%- for f in model.fields %}
 {%- if not loop.first -%}
@@ -165,5 +253,6 @@ WHERE [{{model.fields[0].name}}]=@{{model.fields[0].name}}
 
         private const string c_sqlInsert = "sp3_{{model.table}}_i";
         private const string c_sqlUpdate = "sp3_{{model.table}}_u";
+        private const string c_sqlDelete = "sp3_{{model.table}}_d";
     }
 }

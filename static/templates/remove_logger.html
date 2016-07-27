@@ -1,0 +1,29 @@
+namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Business
+{
+    internal class {{model}}RemoveLogger : ExpiredDataRemoveLogger<long>
+    {
+        public {{model}}RemoveLogger(ExpiredDataHandleLog<long> log)
+            : base("{{ model }}DeleteJob", log)
+        {
+        }
+
+        protected override int StartCode
+        {
+            get { return c_start; }
+        }
+
+        protected override int FinishCode
+        {
+            get { return c_finish; }
+        }
+
+        protected override int BatchCompleteCode
+        {
+            get { return c_batchComplete; }
+        }
+
+        private const int c_start = ;
+        private const int c_finish = ;
+        private const int c_batchComplete = ;
+    }
+}

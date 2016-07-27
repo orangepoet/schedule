@@ -1,0 +1,25 @@
+using Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Business;
+
+namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.WebService
+{
+    public static class {{model}}DeleteService
+    {
+        public static void Process()
+        {
+            Processor.Process(
+                "{{model}}DeleteService",/* ServiceName */
+                () => { ExecuteCore(); }
+                );
+        }
+
+        private static void ExecuteCore()
+        {
+            IHandler handler;
+            IDataRemoveLogger<long> logger;
+
+            logger = new {{ model }}RemoveLogger(ExpiredDataHandleLog<long>.CreateInstance());
+            handler = new {{ model }}RemoveHandler(logger);
+            handler.Handle();
+        }
+    }
+}

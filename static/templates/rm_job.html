@@ -1,0 +1,24 @@
+using System;
+using Arch.JobAgent.API;
+using Arch.JobAgent.API.Entity;
+
+namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.WebService
+{
+    public class {{model}}DeleteJob : JobBase
+    {
+        protected override void OnStart(string param)
+        {
+            try
+            {
+                {{model}}DeleteService.Process();
+                this.JobResult = JobResult.Success;
+            }
+            catch (Exception)
+            {
+                this.JobResult = JobResult.Fail;
+            }
+
+            this.JobStatus = JobStatus.Stoped;
+        }
+    }
+}

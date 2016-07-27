@@ -10,6 +10,7 @@ _configer.read(os.path.join(BARE_DIR, 'app.ini'))
 
 
 def get_config(module_file, field):
-    section = os.path.basename(module_file).rstrip('.py')
+    (file_raw_name, extension) = os.path.splitext(os.path.basename(module_file))
+    section = file_raw_name
     option = field
     return _configer.get(section, option)

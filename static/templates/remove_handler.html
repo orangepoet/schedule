@@ -1,0 +1,64 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+
+using Ctrip.Mobile.Server.SmartTrip.Common.Error;
+using Ctrip.Mobile.Server.SmartTrip.Common.Utility;
+using Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Repository;
+
+namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Business
+{
+    internal class {{ model }}RemoveHandler : ExpiredDataRemoveHandler<long>
+    {
+        public {{ model }}RemoveHandler(IDataRemoveLogger<long> logger)
+            : base(logger)
+        {
+        }
+
+        protected override bool TryHandleBatch(out ExpiredDataHandleLog<long> batchLog)
+        {
+            IList<{{ model }}> entities;
+
+            batchLog = ExpiredDataHandleLog<long>.CreateInstance();
+            try
+            {
+                entities = {{ model }}Repository.QueryTopN(s_handleRecordCountEachTime, Logger.Log.KeySet.LastOrDefault());
+
+                if (entities == null || entities.Count == 0)
+                {
+                    return false;
+                }
+
+                foreach ({{ model }} item in entities)
+                {
+                    if (!IsExpired(item, Logger.StartTime))
+                    {
+                        return false;
+                    }
+
+                    {{ model }}Repository.Delete(item.{{ model }}Id);
+                    batchLog.KeySet.Add(item.{{ model }}Id);
+                }
+                return true;
+            }
+            catch (ServiceException ex)
+            {
+                LoggingUtility.WriteError(ex);
+            }
+            catch (Exception ex)
+            {
+                LoggingUtility.WriteError(ex, (int)ServiceErrorCode.UnknownError);
+            }
+            return batchLog.Count > 0;
+        }
+
+        private bool IsExpired({{ model }} log, DateTime startTime)
+        {
+            Debug.Assert(log != null);
+            return ### < startTime.Date.##;
+        }
+
+        private static readonly int s_handleRecordCountEachTime = AppSettingUtility.GetAppSetting("HandleRecordCountEachTime", 1000);
+    }
+}

@@ -1,12 +1,18 @@
 # encoding: utf-8
 # -*- coding: uft-8 -*-
-import sys
 import re
+import sys
+
+from app import get_config
 
 __author__ = 'chengz'
 
 reload(sys)
 sys.setdefaultencoding("utf-8")
+
+out_match_file = get_config(__file__, 'out_match_file')
+out_unmatched_file = get_config(__file__, 'out_unmatched_file')
+in_data_file = get_config(__file__, 'in_data_file')
 
 
 def is_match(left, right):
@@ -76,7 +82,7 @@ def is_match(left, right):
 def main():
     y_set = []
     n_set = []
-    with open('D:/tmp/Analyse/data.txt', 'r') as fp:
+    with open(in_data_file, 'r') as fp:
         # match_line = [628]
         for index, line in enumerate(fp.readlines()):
             # print line
@@ -94,10 +100,10 @@ def main():
                 print line_no, 'err: ', line
 
     # save result
-    with open('d:/tmp/Analyse/data_y.txt', 'w+') as fp:
+    with open(out_match_file, 'w+') as fp:
         fp.writelines(y_set)
 
-    with open('d:/tmp/Analyse/data_n.txt', 'w+') as fp:
+    with open(out_unmatched_file, 'w+') as fp:
         fp.writelines(n_set)
     print 'done'
 

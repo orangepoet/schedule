@@ -46,9 +46,7 @@ def get_service_contract(dir_path, file_name, service_item_config):
 
     service_code = service_item_config[req_class_name]
     version_sorted_set = sorted(version_set)
-    # print 'check [{file}], code: [{code}], version: {version}'.format(
-    #     file=file_name, code=service_code, version=version_sorted_set)
-    return (service_code, version_sorted_set)
+    return service_code, version_sorted_set
 
 
 def check_service_item_map(service_item_map):
@@ -126,7 +124,7 @@ def check_version_map(lst_contract_service_item):
 
 
 def get_new_contract_code_list(version, dir_ctc):
-    return (version, [int(service_code.replace('.xml', '')) for service_code in listdir(dir_ctc)])
+    return version, [int(service_code.replace('.xml', '')) for service_code in listdir(dir_ctc)]
 
 
 def check_by_contract_code():
@@ -188,7 +186,7 @@ def check_by_new_contract_xml():
 
 
 def main():
-    print 'current version: ', int(current_version)-mini_version_value,'\n'
+    print 'current version: ', int(current_version) - mini_version_value, '\n'
     check_by_contract_code()
     check_by_new_contract_xml()
 

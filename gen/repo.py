@@ -1,8 +1,12 @@
-from gen import render_template, write_file, read_as_json, read_as_lines
+from app import get_config
+from gen import render_template, write_file, read_as_lines
 
 template_name = 'repository.html'
-base_config = 'repo.txt'
-tb_config = 'tb.txt'
+tb_config = 'table.txt'
+
+entity = get_config(__file__, 'entity')
+table_name = get_config(__file__, 'table_name')
+namespace = get_config(__file__, 'namespace')
 
 
 def get_line_fields(line):
@@ -33,24 +37,27 @@ def get_db_type(dbtype):
 def get_repo_model():
     ret = []
 
-    _base = read_as_json(base_config)
     for line in read_as_lines(tb_config):
         ret.append(get_line_fields(line))
 
     return {
-        'name': _base['name'],
-        'entity': _base['entity'],
-        'table': _base['table'],
-        'namespace': _base['namespace'],
+        'name': entity,
+        'entity': entity,
+        'table': table_name,
+        'namespace': namespace,
         'fields': ret
     }
 
 
-def main():
+def render_repo():
     model = get_repo_model()
     page = render_template(template_name, model)
     if page:
-        write_file('repo.txt', page)
+        write_file('{0}Repository.cs'.format(model['name']), page, 'd:/tmp/out')
+
+
+def main():
+    render_repo()
 
     print 'done'
 
