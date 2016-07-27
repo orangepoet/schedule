@@ -5,17 +5,18 @@ from xml.etree import ElementTree as et
 from app import get_config
 
 current_version = int(get_config(__file__, 'version'))
-dir_ctc = get_config(__file__, 'contract_dir')
+dir_contract_xml = get_config(__file__, 'dir_contract_xml')
+service_config_path = get_config(__file__, 'service_config_path')
+version_map_path = get_config(__file__, 'version_map_path')
+contract_dir = get_config(__file__, 'contract_dir')
+
 mini_version_value = 584
 
 
 def get_service_config():
-    file_path = 'D:\schedule\src\Schedule.MobileService\SmartTrip\ScheduleApi\Server.Web\Config\ServiceItem\ServiceItem.smarttrip.xml'
-    root = et.parse(file_path).getroot()
-    service_items = root.findall('item')
     return dict(
         [(get_service_short_name(item.attrib['requestClass']), int(item.attrib['serviceName']))
-         for item in service_items])
+         for item in get_service_items()])
 
 
 def get_service_short_name(service_class_full_name):
@@ -64,9 +65,7 @@ def check_service_item_map(service_item_map):
 
 def get_version_map_items():
     """Resolve ServiceItem.smarttrip.xml"""
-
-    file_path = 'D:\schedule\src\Schedule.MobileService\SmartTrip\ScheduleApi\Server.Web\Config\VersionMapItem\VersionMapItem.smarttrip.xml'
-    root = et.parse(file_path).getroot()
+    root = et.parse(version_map_path).getroot()
     items = root.findall('item')
 
     ret = dict()
@@ -127,13 +126,13 @@ def get_new_contract_code_list(version, dir_ctc):
     return version, [int(service_code.replace('.xml', '')) for service_code in listdir(dir_ctc)]
 
 
-def check_by_contract_code():
+# region check_by_contract_code
+def check_by_code():
     print 'check_by_contract_code'
     print '--------------------------------------'
 
     service_config = get_service_config()
 
-    contract_dir = 'd:\schedule\src\Schedule.MobileService\SmartTrip\ScheduleApi\SmartTrip.DataContract'
     lst_svc_ver_data = []
     for contract_file in listdir(contract_dir):
         if contract_file.endswith('DataContract.cs') or contract_file.endswith('Contract.cs'):
@@ -148,21 +147,23 @@ def check_by_contract_code():
     print '--- end ---\n'
 
 
+def get_service_items():
+    root = et.parse(service_config_path).getroot()
+    return root.findall('item')
+
+
 def get_register_services():
-    file_path = 'D:\schedule\src\Schedule.MobileService\SmartTrip\ScheduleApi\Server.Web\Config\ServiceItem\ServiceItem.smarttrip.xml'
-    root = et.parse(file_path).getroot()
-    service_items = root.findall('item')
-    return set(int(item.attrib['serviceName']) for item in service_items)
+    return set(int(item.attrib['serviceName']) for item in get_service_items())
 
 
-def check_by_new_contract_xml():
+def check_by_xml():
     print 'check_by_new_contract_xml'
     print '--------------------------------------'
 
     register_services = get_register_services()
 
     version_map_items = get_version_map_items()
-    new_contracts = get_new_contract_code_list(current_version, dir_ctc)
+    new_contracts = get_new_contract_code_list(current_version, dir_contract_xml)
     version_value = new_contracts[0] - mini_version_value
     if not version_map_items.has_key(version_value):
         print 'error: version map lose new service all'
@@ -187,8 +188,8 @@ def check_by_new_contract_xml():
 
 def main():
     print 'current version: ', int(current_version) - mini_version_value, '\n'
-    check_by_contract_code()
-    check_by_new_contract_xml()
+    check_by_code()
+    check_by_xml()
 
 
 if __name__ == '__main__':

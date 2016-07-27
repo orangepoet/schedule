@@ -3,16 +3,17 @@
 
 import openpyxl
 
+from app import get_config
 from gen import write_file, render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
-excel_path = unicode(r'D:\schedule\doc\ctc\6.19\6.19.旅行日程 - 服务接口.xlsx')
-sheet_name = '30300601'
+excel_path = unicode(get_config(__file__, 'excel_path'))
+sheet_name = unicode(get_config(__file__, 'sheet_name'))
 
 
-def get_xsd_type(metadata, ctctype):
-    if ctctype is None:
+def get_xsd_type(metadata, ctc_type):
+    if ctc_type is None:
         ret = {
             'dynamic': 'xs:string',
             'int4': 'xs:int',
@@ -21,11 +22,11 @@ def get_xsd_type(metadata, ctctype):
             'boolean': 'xs:boolean',
             'decimal2': 'xs:decimal',
             'decimal6': 'xs:decimal',
-            'datetime':'xs:dateTime',
-            'code2':'string'
+            'datetime': 'xs:dateTime',
+            'code2': 'string'
         }[str(metadata).lower()]
     else:
-        ret = ctctype + 'Type'
+        ret = ctc_type + 'Type'
     return ret
 
 

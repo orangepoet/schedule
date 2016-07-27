@@ -3,16 +3,17 @@
 
 import openpyxl
 
+from app import get_config
 from gen import write_file, render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
-excel_path = unicode(r'D:\schedule\doc\ctc\H5Api\H5Api.xlsx')
-sheet_name = 'UserTravelHistorySearch'
+excel_path = unicode(get_config(__file__, 'excel_path'))
+sheet_name = get_config(__file__, 'sheet_name')
 
 
-def get_xsd_type(metadata, ctctype):
-    if ctctype is None:
+def get_xsd_type(metadata, ctc_type):
+    if ctc_type is None:
         ret = {
             'string': 'xs:string',
             'int': 'xs:int',
@@ -23,7 +24,7 @@ def get_xsd_type(metadata, ctctype):
             'decimal6': 'xs:decimal'
         }[str(metadata).lower()]
     else:
-        ret = ctctype + 'Type'
+        ret = ctc_type + 'Type'
     return ret
 
 
@@ -34,13 +35,13 @@ def get_elements(children):
             'name': child.get('name'),
             'type': get_xsd_type(child.get('metadata'), child.get('type')),
             'minOccurs': '1' if child.get('required') == 'Y' else '0',
-            'maxOccurs': 'unbounded' if is_collection(child.get('metadata')) else '1',
+            'maxOccurs': 'unbounded' if is_unbound(child.get('metadata')) else '1',
             'desc': child.get('remark')
         })
     return ret
 
 
-def is_collection(metadata):
+def is_unbound(metadata):
     if not isinstance(metadata, basestring):
         return False
     return metadata.lower() in ('list', 'array')
@@ -65,7 +66,7 @@ def parse_xsd_type(xls_obj):
     return ret
 
 
-def add_request_head(request):
+def append_request_head(request):
     request['elements'].insert(0, {
         'name': 'head',
         'type': 'mobileCommon:MobileRequestHead',
@@ -75,7 +76,7 @@ def add_request_head(request):
     })
 
 
-def add_response_status(response):
+def append_response_status(response):
     response['elements'].insert(0, {
         'name': 'ResponseStatus',
         'type': 'common:ResponseStatusType',
@@ -88,9 +89,9 @@ def add_response_status(response):
 def post_execute(complex_types):
     for ct in complex_types:
         if ct['name'].endswith('RequestType'):
-            add_request_head(ct)
+            append_request_head(ct)
         elif ct['name'].endswith('ResponseType'):
-            add_response_status(ct)
+            append_response_status(ct)
     pass
 
 
