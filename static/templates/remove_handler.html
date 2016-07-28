@@ -50,7 +50,7 @@ namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Business
             {
                 LoggingUtility.WriteError(ex, (int)ServiceErrorCode.UnknownError);
             }
-            return batchLog.Count > 0;
+            return true;
         }
 
         private bool IsExpired({{ model }} log, DateTime startTime)

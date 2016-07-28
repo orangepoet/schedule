@@ -9,21 +9,17 @@ namespace Ctrip.Mobile.Server.SmartTrip.ExpiredDataRemovedJobws.Business
 
         protected override int StartCode
         {
-            get { return c_start; }
+            get { return LoggingBusinessCode.{{model}}.Start; }
         }
 
         protected override int FinishCode
         {
-            get { return c_finish; }
+            get { return LoggingBusinessCode.{{model}}.Finish; }
         }
 
         protected override int BatchCompleteCode
         {
-            get { return c_batchComplete; }
+            get { return LoggingBusinessCode.{{model}}.BatchComplete; }
         }
-
-        private const int c_start = ;
-        private const int c_finish = ;
-        private const int c_batchComplete = ;
     }
 }

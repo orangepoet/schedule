@@ -9,7 +9,7 @@ using Ctrip.Mobile.DBAccess;
 
 namespace {{model.namespace}}
 {
-    public sealed class {{model.entity}}
+    public sealed class {{model.entity}}claer
     {
         {% for f in model.fields -%}
         public {{f.ctype}} {{f.name}} { get; set; }
