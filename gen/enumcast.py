@@ -30,8 +30,8 @@ def main():
                 'value': fields[1].strip()
             })
     page = render_template(template_name, model)
-    if page:
-        write_file('enumcast.txt', page)
+    if page is not None:
+        write_file('enumcast.txt', page,'d:/tmp/out')
 
     print 'done'
 

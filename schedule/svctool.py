@@ -4,7 +4,7 @@
 from os.path import join
 from xml.etree import ElementTree as et
 
-from config import copy
+from schedule import copy
 
 dir_api = 'd:/schedule/src/Schedule.MobileService/SmartTrip/ScheduleApi'
 dir_api_web = dir_api + '/Server.Web/'

@@ -39,7 +39,8 @@ def read_as_json(file_name, dir_path='in'):
 
 def write_file(file_name, out, dir_path='out'):
     if dir_path == 'out':
-        file_path = join(BARE_DIR, 'static/out', file_name)
+        if exists(dir_path):
+            file_path = join(BARE_DIR, 'static/out', file_name)
     else:
         if not exists(dir_path):
             raise ValueError('dir path not exists')
