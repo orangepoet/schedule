@@ -3,8 +3,8 @@
 
 import openpyxl
 
-from app import get_config
-from gen import write_file, render_template
+from app import get_config, write_file, TMP_OUT
+from gen import render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
@@ -95,14 +95,12 @@ def post_execute(complex_types):
     pass
 
 
-def parse_xsd(sheet_data):
-    ret = []
-    ret.extend(parse_xsd_type(sheet_data['req']))
-    ret.extend(parse_xsd_type(sheet_data['resp']))
-
-    post_execute(ret)
-
-    return ret
+def get_xsd_types(req, resp):
+    xsd_types = []
+    xsd_types.append(req)
+    xsd_types.append(resp)
+    post_execute(xsd_types)
+    return xsd_types
 
 
 def main():
@@ -111,12 +109,12 @@ def main():
     """
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb.get_sheet_by_name(sheet_name)
-    sheet_data = get_sheet_data(sheet)
-    xsd_types = parse_xsd(sheet_data)
+    req, resp = get_sheet_data(sheet)
 
-    page = render_template(template_name, xsd_types)
-    if page:
-        write_file('xsd.txt', page)
+    xsd_types = get_xsd_types(req, resp)
+    page = render_template(template_name, model=xsd_types)
+    if page is not None:
+        write_file('xsd_{0}.txt'.format(sheet_name), page, TMP_OUT)
 
     print 'done'
 

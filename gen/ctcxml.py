@@ -7,8 +7,8 @@ from os.path import exists, join
 
 import openpyxl
 
-from app import get_config
-from gen import render_template, write_file
+from app import get_config, write_file
+from gen import render_template
 
 template_name = 'ctcxml.html'
 excel_path = unicode(get_config(__file__, 'excel_path'))
@@ -20,15 +20,16 @@ def is_not_default_color(font):
     return font.color.value != while_color
 
 
-def try_get_upd_svc(row):
+def get_svc_metadata(row):
     service_code = row[1]
     service_name = row[2]
     service_desc = row[3]
-    if service_code.value and is_not_default_color(service_code.font):
+    if service_code.value:
         return {
             'code': service_code.value,
             'name': service_name.value,
-            'desc': service_desc.value
+            'desc': service_desc.value,
+            'mark': True if is_not_default_color(service_code.font) else False
         }
     else:
         return None
@@ -55,10 +56,7 @@ def get_sheet_data(sheet):
     # response
     resp = get_square_data(header, rows, split_row_idx, row_max, col_min, col_max)
 
-    return {
-        'req': req,
-        'resp': resp
-    }
+    return req, resp
 
 
 def get_header(row_header, col_min, col_max):
@@ -161,20 +159,23 @@ def main():
         mkdir(dir_out)
 
     wb = openpyxl.load_workbook(excel_path)
+
     for row in wb['Overview']:
-        svc_info = try_get_upd_svc(row)
-        if svc_info:
+        svc_metadata = get_svc_metadata(row)
+        if svc_metadata:
+            if not svc_metadata['mark']:
+                continue
             try:
-                sheet = wb.get_sheet_by_name(str(svc_info['code']))
-                model = get_sheet_data(sheet)
-                model['base'] = {'name': svc_info['name'], 'code': svc_info['code'], 'desc': svc_info['desc']}
+                sheet = wb.get_sheet_by_name(str(svc_metadata['code']))
+                req, resp = get_sheet_data(sheet)
             except Exception as e:
                 print e
             else:
-                page = render_template(template_name, model)
+                page = render_template(template_name, req=req, resp=resp, svc=svc_metadata)
                 if page:
-                    file_name = '{}.xml'.format(svc_info['code'])
+                    file_name = '{}.xml'.format(svc_metadata['code'])
                     write_file(file_name, page, dir_out)
+
     print 'done'
 
 

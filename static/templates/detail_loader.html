@@ -2,9 +2,9 @@ using System;
 
 namespace Ctrip.Mobile.Server.SmartTrip.ServiceCore.Services
 {
-    internal sealed class {{model}}CardDetailLoaderProxy : ILoader<{{model}}SmartTripCard>
+    internal sealed class {{bizname}}CardDetailLoaderProxy : ILoader<{{bizname}}SmartTripCard>
     {
-        public {{model}}CardDetailLoaderProxy(CardDetailLoadCommand<{{model}}CardEntity> command)
+        public {{bizname}}CardDetailLoaderProxy(CardDetailLoadCommand<{{bizname}}CardEntity> command)
         {
             if (command == null)
             {
@@ -13,17 +13,17 @@ namespace Ctrip.Mobile.Server.SmartTrip.ServiceCore.Services
             _command = command;
         }
 
-        public {{model}}SmartTripCard Load()
+        public {{bizname}}SmartTripCard Load()
         {
-            ILoader<{{model}}SmartTripCard> loader;
+            ILoader<{{bizname}}SmartTripCard> loader;
 
             switch(_command.Method)
             {
                 case LoadMethod.Order:
-                    loader = new Order{{model}}CardDetailLoader(_command.Entity, _command.ClientTimeZone);
+                    loader = new Order{{bizname}}CardDetailLoader(_command.Entity, _command.ClientTimeZone);
                     break;
                 case LoadMethod.NonOrder:
-                    loader = new NonOrder{{model}}CardDetailLoader(_command.Entity, _command.ClientTimeZone);
+                    loader = new NonOrder{{bizname}}CardDetailLoader(_command.Entity, _command.ClientTimeZone);
                     break;
                 default:
                     loader = null;
@@ -33,6 +33,6 @@ namespace Ctrip.Mobile.Server.SmartTrip.ServiceCore.Services
             return loader !=null ? loader.Load():null;
         }
 
-        private readonly CardDetailLoadCommand<{{model}}CardEntity> _command;
+        private readonly CardDetailLoadCommand<{{bizname}}CardEntity> _command;
     }
 }

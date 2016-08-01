@@ -3,8 +3,8 @@
 
 import openpyxl
 
-from app import get_config
-from gen import write_file, render_template
+from app import get_config, write_file
+from gen import render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
@@ -78,7 +78,7 @@ def main():
     sheet_data = get_sheet_data(sheet)
     xsd_types = parse_xsd(sheet_data)
 
-    page = render_template(template_name, xsd_types)
+    page = render_template(template_name, model=xsd_types)
     if page:
         write_file('xsd2.txt', page)
 

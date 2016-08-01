@@ -12,9 +12,6 @@ dir_dst = 'd:/WebSites/SvcTest'
 file_config_profile = 'ConfigProfile.xml'
 file_global_asax = 'Global.asax.cs'
 
-print 'command> 1: debug, 2:update'
-command = raw_input()
-
 config = {
     'src': {
         'dir': dir_api,
@@ -75,26 +72,28 @@ def update():
             copy(src[1], dst[1], '*.xml')
 
 
-def debug(env):
+def debug():
+    print 'env> 1: fat, 2:uat'
+    input = raw_input()
+    if input == '1':
+        env = 'fat'
+    elif input == '2':
+        env = 'uat'
+    else:
+        raise ValueError('invalid env')
     config_profile(env)
     adjust_code()
 
 
 def main():
-    if command == '1':
-        print 'env> 1: fat, 2:uat'
-        input = raw_input()
-        if input == '1':
-            env = 'fat'
-        elif input == '2':
-            env = 'uat'
-        else:
-            raise ValueError('invalid env')
-        debug(env)
-    elif command == '2':
+    print 'command> 1: debug, 2:update'
+    command = int(raw_input())
+    if command == 1:
+        debug()
+    elif command == 2:
         update()
     else:
-        raise ValueError('invalid choice')
+        print 'command not found'
 
     print 'done'
 

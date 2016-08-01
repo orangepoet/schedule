@@ -1,60 +1,125 @@
+﻿# encoding: utf-8
 # -*- coding: utf-8 -*-
+
+import re
 from os import listdir
 from xml.etree import ElementTree as et
 
-from app import get_config
+from app import get_config, read_to_lines
 
 current_version = int(get_config(__file__, 'version'))
 dir_contract_xml = get_config(__file__, 'dir_contract_xml')
-service_config_path = get_config(__file__, 'service_config_path')
-version_map_path = get_config(__file__, 'version_map_path')
-contract_dir = get_config(__file__, 'contract_dir')
-
-mini_version_value = 584
+dir_contract = get_config(__file__, 'dir_contract')
+path_service_items = get_config(__file__, 'path_service_items')
+path_version_map = get_config(__file__, 'path_version_map')
 
 
-def get_service_config():
-    return dict(
-        [(get_service_short_name(item.attrib['requestClass']), int(item.attrib['serviceName']))
-         for item in get_service_items()])
+def get_version_value(version):
+    version_min_value = 584
+    return int(version) - version_min_value
 
 
-def get_service_short_name(service_class_full_name):
-    return service_class_full_name.split(',')[0].split('.')[-1]
-
-
-def get_service_contract(dir_path, file_name, service_item_config):
-    import re
-    from os.path import join
+def read_contract_file(dir, filename, request_service_map):
+    '''读取契约文件'''
 
     version_set = set()
-    file_path = join(dir_path, file_name)
-    with open(file_path, 'r') as fp:
-        for line in fp.readlines():
-            if 'DatagramField' in line:
-                match = re.search('\s*\[DatagramField.*Version\s=\s(?P<ver>\d+).*\]\s*', line)
-                if match:
-                    version = int(match.group('ver'))
-                    if version > 0:
-                        version_set.add(version)
-            elif 'class' in line and 'Request' in line:
-                match = re.search('\s*public[\s+\w+]*class\s+(?P<req_name>\w+)\s*', line)
-                req_class_name = match.group('req_name')
+    for line in read_to_lines(filename, dir):
+        if 'DatagramField' in line:
+            match = re.search('\s*\[DatagramField.*Version\s=\s(?P<ver>\d+).*\]\s*', line)
+            if match:
+                version = int(match.group('ver'))
+                if version > 0:
+                    version_set.add(version)
+        elif 'class' in line and 'Request' in line:
+            match = re.search('\s*public[\s+\w+]*class\s+(?P<req_name>\w+)\s*', line)
+            req_class_name = match.group('req_name')
     if not req_class_name:
         raise ValueError('request class not found')
-    if not service_item_config.has_key(req_class_name):
+    if not request_service_map.has_key(req_class_name):
         raise ValueError('request class not config in service_items')
 
-    service_code = service_item_config[req_class_name]
-    version_sorted_set = sorted(version_set)
-    return service_code, version_sorted_set
+    return request_service_map[req_class_name], sorted(version_set)
 
 
-def check_service_item_map(service_item_map):
-    for version, service_lst in service_item_map.iteritems():
-        for service, sys_code_lst in service_lst.iteritems():
+def read_version_map_items():
+    '''读取version_map配置文件'''
+
+    root = et.parse(path_version_map).getroot()
+    items = root.findall('item')
+
+    ret = dict()
+    for item in items:
+        version_value, service_code, sys_code, begin_version, end_version, category, keyword, remark = \
+            int(item.attrib['value']), \
+            int(item.attrib['serviceCode']), \
+            int(item.attrib['systemCode']), \
+            float(item.attrib['beginClientVersion']), \
+            int(item.attrib['endClientVersion']), \
+            int(item.attrib['category']), \
+            item.attrib['keyword'], \
+            item.attrib['remark']
+
+        validate_version_map_item(begin_version, category, end_version, keyword, remark, service_code, sys_code,
+                                  version_value)
+
+        if not ret.has_key(version_value):
+            ret[version_value] = dict()
+        if not ret[version_value].has_key(service_code):
+            ret[version_value][service_code] = []
+        ret[version_value][service_code].append(sys_code)
+
+    validate_version_map(ret)
+    return ret
+
+
+def read_contract_dir(dir):
+    '''读取契约code文件夹'''
+
+    request_service_map = dict([(request_class_name(item.attrib['requestClass']), int(item.attrib['serviceName']))
+                                for item in read_service_items()])
+
+    ret = []
+    for file in listdir(dir):
+        if file.endswith('Contract.cs'):
+            try:
+                service_versions = read_contract_file(dir, file, request_service_map)
+                ret.append(service_versions)
+            except Exception as e:
+                print 'error: file[{file}] is invalid, msg: {msg}'.format(file=file, msg=e.message)
+    return ret
+
+
+def read_service_items():
+    '''读取ServiceItem配置文件'''
+
+    root = et.parse(path_service_items).getroot()
+    return root.findall('item')
+
+
+def validate_version_map_item(begin_version, category, end_version, keyword, remark, service_code, sys_code,
+                              version_value):
+    item_string_format = '#item code: {code}, value: {value}, platform: {platform}' \
+        .format(code=service_code, value=version_value, platform=sys_code)
+    if sys_code not in [9, 12, 32, 42, 43]:
+        raise ValueError('systemCode out of range' + item_string_format)
+    if begin_version > 600 and get_version_value(begin_version) != version_value:
+        raise ValueError('value not match beginClientVersion' + item_string_format)
+    if end_version != 9999:
+        raise ValueError('endClientVersion is not 9999' + item_string_format)
+    if category != 1:
+        raise ValueError('category is not 1' + item_string_format)
+    if not keyword:
+        raise ValueError('keyword is empty' + item_string_format)
+    if not remark:
+        raise ValueError('remark is empty' + item_string_format)
+
+
+def validate_version_map(service_item_map):
+    for version, svc_codes in service_item_map.iteritems():
+        for service, sys_code_lst in svc_codes.iteritems():
             if 9 in sys_code_lst:
-                continue
+                # continue
+                pass
             elif 12 not in sys_code_lst:
                 print 'warning: ios lose in {service}, version: {version}'.format(service=service, version=version)
             elif 32 not in sys_code_lst:
@@ -63,122 +128,62 @@ def check_service_item_map(service_item_map):
                 print 'warning: ipad lose in {service}, version: {version}'.format(service=service, version=version)
 
 
-def get_version_map_items():
-    """Resolve ServiceItem.smarttrip.xml"""
-    root = et.parse(version_map_path).getroot()
-    items = root.findall('item')
+def request_class_name(class_full_name):
+    '''解析ServiceItem.xml中的类全名'''
 
-    ret = dict()
-    for item in items:
-        version_val = int(item.attrib['value'])
-        service_code = int(item.attrib['serviceCode'])
-        sys_code = int(item.attrib['systemCode'])
-        begin_version = float(item.attrib['beginClientVersion'])
-        end_version = int(item.attrib['endClientVersion'])
-        category = int(item.attrib['category'])
-        keyword = item.attrib['keyword']
-        remark = item.attrib['remark']
-
-        item_string_format = '#item code: {code}, value: {value}, platform: {platform}'.format(code=service_code,
-                                                                                               value=version_val,
-                                                                                               platform=sys_code)
-
-        # validations
-        if sys_code not in [9, 12, 32, 42, 43]:
-            raise ValueError('systemCode out of range' + item_string_format)
-        if begin_version > 600 and begin_version - mini_version_value != version_val:
-            raise ValueError('value not match beginClientVersion' + item_string_format)
-        if end_version != 9999:
-            raise ValueError('endClientVersion is not 9999' + item_string_format)
-        if category != 1:
-            raise ValueError('category is not 1' + item_string_format)
-        if not keyword:
-            raise ValueError('keyword is empty' + item_string_format)
-        if not remark:
-            raise ValueError('remark is empty' + item_string_format)
-        # end validations
-
-        if not ret.has_key(version_val):
-            ret[version_val] = dict()
-        if not ret[version_val].has_key(service_code):
-            ret[version_val][service_code] = []
-        ret[version_val][service_code].append(sys_code)
-
-    check_service_item_map(ret)
-
-    return ret
+    pattern = 'Ctrip\.Mobile\.Server\.SmartTrip\.DataContract\.(?P<req_class_name>\w+), Ctrip.Mobile.Server.SmartTrip.DataContract'
+    match = re.search(pattern, class_full_name)
+    if match is None:
+        raise ValueError('error: request class full name not correct')
+    return match.group('req_class_name')
 
 
-def check_version_map(lst_contract_service_item):
-    version_map_items = get_version_map_items()
-    for service_tuple in lst_contract_service_item:
-        service_code = service_tuple[0]
-        versions = service_tuple[1]
-        for version in versions:
-            if not version_map_items.has_key(version) or not version_map_items[version].has_key(service_code):
-                print 'error: ', 'version map lose config, service: {service_code}, version: {version}'.format(
-                    service_code=service_code, version=version)
+def comp_with_contract_code():
+    '''将契约生成代码和version_map做对比'''
 
-    pass
-
-
-def get_new_contract_code_list(version, dir_ctc):
-    return version, [int(service_code.replace('.xml', '')) for service_code in listdir(dir_ctc)]
-
-
-# region check_by_contract_code
-def check_by_code():
     print 'check_by_contract_code'
     print '--------------------------------------'
 
-    service_config = get_service_config()
+    ctc_service_versions = read_contract_dir(dir_contract)
+    version_map_items = read_version_map_items()
 
-    lst_svc_ver_data = []
-    for contract_file in listdir(contract_dir):
-        if contract_file.endswith('DataContract.cs') or contract_file.endswith('Contract.cs'):
-            try:
-                service_contract = get_service_contract(contract_dir, contract_file, service_config)
-                lst_svc_ver_data.append(service_contract)
-            except Exception as e:
-                print 'error: file[{file}] is invalid, msg: {msg}'.format(file=contract_file, msg=e.message)
-    if lst_svc_ver_data:
-        check_version_map(lst_svc_ver_data)
+    if ctc_service_versions and version_map_items:
+        for service_versions in ctc_service_versions:
+            service_code, versions = service_versions[0], service_versions[1]
+            for version in versions:
+                if not version_map_items.has_key(version) or not version_map_items[version].has_key(service_code):
+                    print 'error: ', 'version map lose config, service: {service_code}, version: {version}'.format(
+                        service_code=service_code, version=version)
 
     print '--- end ---\n'
 
 
-def get_service_items():
-    root = et.parse(service_config_path).getroot()
-    return root.findall('item')
+def comp_with_ctcxml_dst():
+    '''将ctcxml/dst文件夹和version_map做对比'''
 
-
-def get_register_services():
-    return set(int(item.attrib['serviceName']) for item in get_service_items())
-
-
-def check_by_xml():
     print 'check_by_new_contract_xml'
     print '--------------------------------------'
 
-    register_services = get_register_services()
+    register_services = set(int(item.attrib['serviceName']) for item in read_service_items())
 
-    version_map_items = get_version_map_items()
-    new_contracts = get_new_contract_code_list(current_version, dir_contract_xml)
-    version_value = new_contracts[0] - mini_version_value
-    if not version_map_items.has_key(version_value):
+    version_map_items = read_version_map_items()
+    new_service_codes = [int(service_code.rstrip('.xml')) for service_code in listdir(dir_contract_xml)]
+    current_version_value = get_version_value(current_version)
+
+    if not version_map_items.has_key(current_version_value):
         print 'error: version map lose new service all'
-    for service_code in new_contracts[1]:
-        if not version_map_items[version_value].has_key(service_code):
+    for service_code in new_service_codes:
+        if not version_map_items[current_version_value].has_key(service_code):
             print 'error: version map lose service: {service} in {version}'.format(service=service_code,
-                                                                                   version=version_value)
+                                                                                   version=current_version_value)
             continue
-        platforms = version_map_items[version_value][service_code]
+        platforms = version_map_items[current_version_value][service_code]
         if platforms is None:
             raise ValueError('platform is empty')
         else:
-            for needed in [12, 32, 43]:
-                if needed not in platforms:
-                    print 'error: verion map lose platform{sys_code}, service: {service}'.format(sys_code=needed,
+            for sys_code in [12, 32, 43]:
+                if sys_code not in platforms:
+                    print 'error: verion map lose platform{sys_code}, service: {service}'.format(sys_code=sys_code,
                                                                                                  service=service_code)
         if service_code not in register_services:
             print 'error: new service not regiter, service code: {svc_code}'.format(svc_code=service_code)
@@ -187,9 +192,10 @@ def check_by_xml():
 
 
 def main():
-    print 'current version: ', int(current_version) - mini_version_value, '\n'
-    check_by_code()
-    check_by_xml()
+    print 'current version: ', get_version_value(current_version), '\n'
+
+    comp_with_contract_code()
+    comp_with_ctcxml_dst()
 
 
 if __name__ == '__main__':

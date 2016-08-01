@@ -1,10 +1,9 @@
 # encoding: utf-8
 # -*- coding: utf-8 -*-
 
-from app import get_config
-from gen import render_template, write_file
+from app import get_config, write_file, TMP_OUT
+from gen import render_template
 
-TMP_OUT = 'd:/tmp/out'
 TABLE_NAME = get_config(__file__, 'table_name')
 
 

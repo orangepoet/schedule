@@ -1,15 +1,16 @@
 # encoding: utf-8
 # -*- coding: utf-8 -*-
 
-from gen import render_template, read_as_json, write_file
+from app import read_to_json, write_file
+from gen import render_template
 
 template_name = 'soaservice.html'
 
 
 def main():
-    model = read_as_json('soaservice.txt')
+    model = read_to_json('soaservice.txt')
 
-    page = render_template(template_name, model)
+    page = render_template(template_name, model=model)
     if page:
         write_file('soaservice.txt', page)
 

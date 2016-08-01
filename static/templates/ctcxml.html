@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Service name="{{ model.base.name }}" code="{{ model.base.code }}" type="Service" description="{{ model.base.desc }}">
-    <Request name="{{ model.req.name }}" type="Request" version="">
-        {%- for item in model.req.children recursive -%}
+<Service name="{{ svc.name }}" code="{{ svc.code }}" type="Service" description="{{ svc.desc }}">
+    <Request name="{{ req.name }}" type="Request" version="">
+        {%- for item in req.children recursive -%}
             {%- include 'xmlitem.html' -%}
         {%- endfor %}
     </Request>
-    <Response name="{{ model.resp.name }}" type="Response" version="">
-        {%- for item in model.resp.children recursive %}
+    <Response name="{{ resp.name }}" type="Response" version="">
+        {%- for item in resp.children recursive %}
             {%- include 'xmlitem.html' -%}
         {%- endfor %}
     </Response>

@@ -1,5 +1,5 @@
-from app import get_config
-from gen import render_template, write_file, read_as_lines
+from app import get_config, read_to_lines, write_file, TMP_OUT
+from gen import render_template
 
 template_name = 'repository.html'
 tb_config = 'table.txt'
@@ -37,7 +37,7 @@ def get_db_type(dbtype):
 def get_repo_model():
     ret = []
 
-    for line in read_as_lines(tb_config):
+    for line in read_to_lines(tb_config):
         ret.append(get_line_fields(line))
 
     return {
@@ -49,15 +49,11 @@ def get_repo_model():
     }
 
 
-def render_repo():
-    model = get_repo_model()
-    page = render_template(template_name, model)
-    if page:
-        write_file('{0}Repository.cs'.format(model['name']), page, 'd:/tmp/out')
-
-
 def main():
-    render_repo()
+    model = get_repo_model()
+    page = render_template(template_name, model=model)
+    if page:
+        write_file('{0}Repository.cs'.format(model['name']), page, TMP_OUT)
 
     print 'done'
 

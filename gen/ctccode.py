@@ -6,8 +6,8 @@ from os import listdir, mkdir
 from os.path import exists, join, splitext
 from xml.etree import ElementTree as et
 
-from app import get_config
-from gen import render_template, write_file
+from app import get_config, write_file
+from gen import render_template
 
 template_name = 'ctccode.html'
 
@@ -150,7 +150,7 @@ def main():
         mkdir(dir_out)
     for file_name in listdir(dir_in):
         model = get_ctc_types(join(dir_in, file_name))
-        page = render_template(template_name, model)
+        page = render_template(template_name, model=model)
         if page:
             (file_raw_name, extension) = splitext(file_name)
             file_name = '{}.txt'.format(file_raw_name)

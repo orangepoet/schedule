@@ -77,7 +77,7 @@ def do_test_case(test_case, global_config):
         except Exception as e:
             print e.message
 
-
+ 
 def get_global_config():
     with open(join(ROOT, 'ini.txt'), 'r') as fp:
         ini = load(fp)

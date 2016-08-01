@@ -1,18 +1,38 @@
 switch(value)
 {
-    {% for item in model.enum_items -%}
+    {% for item in items -%}
     case {{ item.value }}:
-        return {{model.name}}.{{item.name}};
+        return {{name}}.{{item.name}};
     {% endfor -%}
     default:
-        return {{model.name}}.Unknown;
+        return {{name}}.Unknown;
+}
+
+switch(value)
+{
+    {% for item in items -%}
+    case {{ item.value }}:
+        return "{{item.name}}";
+    {% endfor -%}
+    default:
+        return "";
 }
 
 switch(type)
 {
-    {% for item in model.enum_items  -%}
-    case {{model.name}}.{{ item.name }}:
+    {% for item in items  -%}
+    case {{name}}.{{ item.name }}:
         return {{item.value}};
+    {% endfor -%}
+    default:
+        throw new ArgumentOutOfRangeException("type");
+}
+
+switch(type)
+{
+    {% for item in items  -%}
+    case {{name}}.{{ item.name }}:
+        return "{{item.desc}}";
     {% endfor -%}
     default:
         throw new ArgumentOutOfRangeException("type");
@@ -20,10 +40,10 @@ switch(type)
 
 switch(str)
 {
-    {% for item in model.enum_items  -%}
+    {% for item in items  -%}
     case "{{ item.name.upper()}}":
-        return {{model.name}}.{{ item.name }};
+        return {{name}}.{{ item.name }};
     {% endfor -%}
     default:
-        return {{model.name}}.Unknown;
+        return {{name}}.Unknown;
 }
