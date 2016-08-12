@@ -8,8 +8,8 @@ from gen import render_template
 from gen.ctcxml import get_sheet_data
 
 template_name = 'xsd.html'
-excel_path = unicode(get_config(__file__, 'excel_path'))
-sheet_name = get_config(__file__, 'sheet_name')
+EXCEL_PATH = unicode(get_config(__file__, 'excel_path'))
+SHEET_NAME = get_config(__file__, 'sheet_name')
 
 
 def get_xsd_type(metadata, ctc_type):
@@ -96,14 +96,14 @@ def post_execute(complex_types):
 
 
 def get_xsd_types(req, resp):
-    xsd_types = []
-    xsd_types.append(req)
-    xsd_types.append(resp)
-    post_execute(xsd_types)
-    return xsd_types
+    ret = []
+    ret.extend(parse_xsd_type(req))
+    ret.extend(parse_xsd_type(resp))
+    post_execute(ret)
+    return ret
 
 
-def main():
+def xls2xsd(excel_path, sheet_name):
     """
     针对H5Api.xlsx 生成XSD代码
     """
@@ -112,12 +112,12 @@ def main():
     req, resp = get_sheet_data(sheet)
 
     xsd_types = get_xsd_types(req, resp)
-    page = render_template(template_name, model=xsd_types)
+    page = render_template(template_name, types=xsd_types)
     if page is not None:
-        write_file('xsd_{0}.txt'.format(sheet_name), page, TMP_OUT)
-
-    print 'done'
+        write_file('xsd_{0}.xml'.format(sheet_name), page, TMP_OUT)
 
 
 if __name__ == '__main__':
-    main()
+    xls2xsd(EXCEL_PATH, SHEET_NAME)
+
+    print 'done'

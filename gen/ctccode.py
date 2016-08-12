@@ -122,19 +122,18 @@ def resolve_xml_major(xml_major):
 
 def get_ctc_xml_dict(xml_path):
     root = et.parse(xml_path).getroot()
-    return {
-        "req": resolve_xml_major(root.find("Request")),
-        "resp": resolve_xml_major(root.find("Response")),
-    }
+
+    # req, resp
+    return resolve_xml_major(root.find("Request")), resolve_xml_major(root.find("Response"))
 
 
 def get_ctc_types(xml_path):
     ret = []
 
-    ctc_xml_dict = get_ctc_xml_dict(xml_path)
+    req, resp = get_ctc_xml_dict(xml_path)
 
-    ret.extend(parse_head(ctc_xml_dict["req"]))
-    ret.extend(parse_head(ctc_xml_dict["resp"]))
+    ret.extend(parse_head(req))
+    ret.extend(parse_head(resp))
     return ret
 
 

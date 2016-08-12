@@ -13,6 +13,7 @@ from gen import render_template
 template_name = 'ctcxml.html'
 excel_path = unicode(get_config(__file__, 'excel_path'))
 xml_root = get_config(__file__, 'xml_root')
+only_mark = bool(int(get_config(__file__, 'only_mark')))
 
 
 def is_not_default_color(font):
@@ -154,16 +155,21 @@ def escape(cell_value):
 
 
 def main():
-    dir_out = join(xml_root, time.strftime('%Y%m%dH%H%M'))
-    if not exists(dir_out):
-        mkdir(dir_out)
+    out_dir = join(xml_root, time.strftime('%Y%m%dH%H%M'))
+    if not exists(out_dir):
+        mkdir(out_dir)
+
+    if not only_mark:
+        out_ref_dir = join(out_dir, 'ref')
+        mkdir(out_ref_dir)
 
     wb = openpyxl.load_workbook(excel_path)
 
     for row in wb['Overview']:
         svc_metadata = get_svc_metadata(row)
         if svc_metadata:
-            if not svc_metadata['mark']:
+            mark = svc_metadata['mark']
+            if not mark and only_mark:
                 continue
             try:
                 sheet = wb.get_sheet_by_name(str(svc_metadata['code']))
@@ -174,7 +180,7 @@ def main():
                 page = render_template(template_name, req=req, resp=resp, svc=svc_metadata)
                 if page:
                     file_name = '{}.xml'.format(svc_metadata['code'])
-                    write_file(file_name, page, dir_out)
+                    write_file(file_name, page, out_dir if mark else out_ref_dir)
 
     print 'done'
 
