@@ -102,7 +102,6 @@ def main():
     # save result
     with open(out_match_file, 'w+') as fp:
         fp.writelines(y_set)
-
     with open(out_unmatched_file, 'w+') as fp:
         fp.writelines(n_set)
     print 'done'

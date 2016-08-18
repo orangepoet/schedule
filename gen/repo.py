@@ -49,7 +49,7 @@ def get_repo_model():
     }
 
 
-def main():
+def render_repo():
     model = get_repo_model()
     page = render_template(template_name, model=model)
     if page:
@@ -59,4 +59,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    render_repo()

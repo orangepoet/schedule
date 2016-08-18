@@ -18,7 +18,6 @@ def render_template(tpl_name, **context):
     """
     Jinja2 render method wrapper, template + model => page, no throwable
     :param tpl_name: template name
-    :param model: model data
     :return: string representation of generated page
     """
     try:

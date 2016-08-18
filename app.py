@@ -56,7 +56,7 @@ def read_to_str(file_name, dir_path='in'):
         return fp.read()
 
 
-def write_file(file_name, buffer, dir_path='out'):
+def write_file(file_name, b, dir_path='out'):
     if dir_path == 'out':
         file_path = join(BARE_DIR, 'static/out', file_name)
     else:
@@ -64,4 +64,4 @@ def write_file(file_name, buffer, dir_path='out'):
             raise ValueError('dir path not exists')
         file_path = join(dir_path, file_name)
     with open(file_path, 'w+') as fp:
-        fp.write(buffer)
+        fp.write(b)

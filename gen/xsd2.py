@@ -71,7 +71,7 @@ def parse_xsd(sheet_data):
 
 def main():
     """
-    针对SOTP协议客户端契约生产的XSD, 注意: 请使用xsd0生成XSD如果是为H5生成XSD
+    针对SOTP协议客户端契约生成的XSD, 注意: 请使用xsd0生成XSD如果是为H5生成XSD
     """
     wb = openpyxl.load_workbook(excel_path)
     sheet = wb.get_sheet_by_name(sheet_name)
