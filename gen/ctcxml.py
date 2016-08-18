@@ -12,7 +12,7 @@ from gen import render_template
 
 template_name = 'ctcxml.html'
 excel_path = unicode(get_config(__file__, 'excel_path'))
-xml_root = get_config(__file__, 'xml_root')
+ROOT = get_config(__file__, 'root')
 only_mark = bool(int(get_config(__file__, 'only_mark')))
 
 
@@ -155,13 +155,20 @@ def escape(cell_value):
 
 
 def main():
-    out_dir = join(xml_root, time.strftime('%Y%m%dH%H%M'))
-    if not exists(out_dir):
-        mkdir(out_dir)
+    if not exists(ROOT):
+        mkdir(ROOT)
+
+    xml_root_dir = join(ROOT, 'xml')
+    if not exists(xml_root_dir):
+        mkdir(xml_root_dir)
+
+    xml_dir = join(xml_root_dir, time.strftime('%Y%m%dH%H%M'))
+    if not exists(xml_dir):
+        mkdir(xml_dir)
 
     if not only_mark:
-        out_ref_dir = join(out_dir, 'ref')
-        mkdir(out_ref_dir)
+        xml_ref_dir = join(xml_dir, 'ref')
+        mkdir(xml_ref_dir)
 
     wb = openpyxl.load_workbook(excel_path)
 
@@ -180,7 +187,7 @@ def main():
                 page = render_template(template_name, req=req, resp=resp, svc=svc_metadata)
                 if page:
                     file_name = '{}.xml'.format(svc_metadata['code'])
-                    write_file(file_name, page, out_dir if mark else out_ref_dir)
+                    write_file(file_name, page, xml_dir if mark else xml_ref_dir)
 
     print 'done'
 

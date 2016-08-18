@@ -11,6 +11,8 @@ from gen import render_template
 
 template_name = 'ctccode.html'
 
+DIR_ROOT = get_config(__file__, 'root')
+
 
 def escape(attrib_val):
     return str(attrib_val).replace('\\', '/').replace('"', '\\"')
@@ -138,22 +140,28 @@ def get_ctc_types(xml_path):
 
 
 def main():
-    dir_root = get_config(__file__, 'root')
-    dir_in = join(dir_root, 'xml', 'dst')
-    dir_out = join(dir_root, 'code', time.strftime('%Y%m%dH%H%M'))
+    if not exists(DIR_ROOT):
+        mkdir(DIR_ROOT)
 
-    if not exists(dir_in):
-        raise ValueError('dir_in not exists')
+    xml_dst_dir = join(DIR_ROOT, 'xml', 'dst')
+    if not exists(xml_dst_dir):
+        raise ValueError('target xml dir not found: {}'.format(xml_dst_dir))
 
-    if not exists(dir_out):
-        mkdir(dir_out)
-    for file_name in listdir(dir_in):
-        model = get_ctc_types(join(dir_in, file_name))
+    code_root_dir = join(DIR_ROOT, 'code')
+    if not exists(code_root_dir):
+        mkdir(code_root_dir)
+
+    code_out_dir = join(code_root_dir, time.strftime('%Y%m%dH%H%M'))
+    if not exists(code_out_dir):
+        mkdir(code_out_dir)
+
+    for file_name in listdir(xml_dst_dir):
+        model = get_ctc_types(join(xml_dst_dir, file_name))
         page = render_template(template_name, model=model)
         if page:
             (file_raw_name, extension) = splitext(file_name)
             file_name = '{}.txt'.format(file_raw_name)
-            write_file(file_name, page, dir_out)
+            write_file(file_name, page, code_out_dir)
 
     print 'done'
 
